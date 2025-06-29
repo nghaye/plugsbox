@@ -56,7 +56,10 @@ Pour lancer l'environnement pour la première fois, suivez ces étapes :
     ```
     Suivez les instructions pour définir un nom d'utilisateur, une adresse e-mail et un mot de passe.
 
-L'environnement est maintenant prêt ! Vous pouvez accéder à NetBox à l'adresse http://localhost:8000.
+L'environnement est maintenant prêt ! Vous pouvez vous connecter à l'interface web de NetBox via l'URL ci-dessous en utilisant les identifiants que vous venez de créer.
+
+*   **URL :** `http://<ip_du_serveur>:8002/`
+    *   Si vous exécutez l'environnement sur votre machine locale, utilisez `http://localhost:8002/`.
 
 ### Commandes courantes
 
