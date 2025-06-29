@@ -77,6 +77,11 @@ class Plug(NetBoxModel, CableTermination):
         default=PlugStatusChoices.STATUS_TO_PATCH,
         verbose_name="Statut"
     )
+    # Ajout de l'ID vers l'ancienne DB Plugs
+    legacy_id = models.IntegerField(
+        verbose_name="ID dans l'ancienne base de données",
+        help_text="Identifiant dans l'ancienne base de données Plugs"
+    )
 
     class Meta:
         ordering = ('site', 'location', 'name')
