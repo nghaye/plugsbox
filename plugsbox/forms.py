@@ -4,6 +4,7 @@ from dcim.models import Location, Site
 from ipam.models import IPAddress, VLAN
 from netbox.forms import NetBoxModelForm
 from tenancy.forms import ContactModelFilterForm, TenancyForm
+from tenancy.models import Contact, Tenant
 from utilities.forms import add_blank_choice
 from utilities.forms.fields import CommentField, DynamicModelChoiceField
 
@@ -28,7 +29,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         label='Local'
     )
     contact = DynamicModelChoiceField(
-        queryset=Site.objects.all(),
+        queryset=Contact.objects.all(),
         required=False,
         label='Personne de contact'
     )
@@ -133,12 +134,12 @@ class PlugBulkEditForm(NetBoxModelForm):
         label='Local'
     )
     tenant = DynamicModelChoiceField(
-        queryset=Site.objects.all(),
+        queryset=Tenant.objects.all(),
         required=False,
         label='Gestionnaire'
     )
     contact = DynamicModelChoiceField(
-        queryset=Site.objects.all(),
+        queryset=Contact.objects.all(),
         required=False,
         label='Personne de contact'
     )

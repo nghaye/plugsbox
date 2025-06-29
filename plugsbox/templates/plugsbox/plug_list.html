@@ -1,0 +1,20 @@
+{% extends 'generic/object_list.html' %}
+{% load helpers %}
+
+{% block title %}Prises Réseau{% endblock %}
+
+{% block content_title %}
+    <h1>Prises Réseau</h1>
+{% endblock %}
+
+{% block add_button %}
+    <a href="{% url 'plugins:plugsbox:plug_add' %}" class="btn btn-primary">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Ajouter
+    </a>
+{% endblock %}
+
+{% block bulk_buttons %}
+    <a href="{% url 'plugins:plugsbox:plug_import' %}" class="btn btn-light">
+        <i class="mdi mdi-upload" aria-hidden="true"></i> Importer
+    </a>
+{% endblock %}

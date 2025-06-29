@@ -1,0 +1,42 @@
+{% extends 'generic/bulk_edit.html' %}
+{% load form_helpers %}
+
+{% block title %}Édition en Masse - Prises Réseau{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug_list' %}">Prises Réseau</a>
+    </li>
+{% endblock %}
+
+{% block form %}
+<div class="row">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Attributs</h5>
+            <div class="card-body">
+                {% render_field form.status %}
+                {% render_field form.interfaceconfig %}
+                {% render_field form.contact %}
+                {% render_field form.tenant %}
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Réseau</h5>
+            <div class="card-body">
+                {% render_field form.vlan %}
+            </div>
+        </div>
+        <div class="card">
+            <h5 class="card-header">Description</h5>
+            <div class="card-body">
+                {% render_field form.description %}
+                {% render_field form.comments %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

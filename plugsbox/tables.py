@@ -1,12 +1,12 @@
 import django_tables2 as tables
 
 from netbox.tables import NetBoxTable, columns
-from tenancy.tables import ContactsColumnMixin, TenantsColumnMixin
+from tenancy.tables import ContactsColumnMixin, TenancyColumnsMixin
 
 from .models import Plug
 
 
-class PlugTable(NetBoxTable, TenantsColumnMixin, ContactsColumnMixin):
+class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
     """
     Table pour l'affichage des prises réseau (Plug).
     """

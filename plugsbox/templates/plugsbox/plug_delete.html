@@ -1,0 +1,31 @@
+{% extends 'generic/object_delete.html' %}
+
+{% block title %}Supprimer {{ object.name }}{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug_list' %}">Prises Réseau</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug' pk=object.pk %}">{{ object.name }}</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer cette prise réseau ?</p>
+                    <h5>{{ object.name }}</h5>
+                    <ul>
+                        <li><strong>Site:</strong> {{ object.site|default:"—" }}</li>
+                        <li><strong>Emplacement:</strong> {{ object.location|default:"—" }}</li>
+                        <li><strong>Statut:</strong> {{ object.get_status_display|default:"—" }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

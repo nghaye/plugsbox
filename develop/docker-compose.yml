@@ -16,7 +16,7 @@ services:
       - ./dev.env
     volumes:
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ../plugsbox:/source/plugsbox
+      - ../plugsbox:/source/plugsbox/plugsbox
     tty: true
   worker:
     build:
@@ -29,7 +29,7 @@ services:
       - ./dev.env
     volumes:
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ../plugsbox:/source/plugsbox
+      - ../plugsbox:/source/plugsbox/plugsbox
     tty: true
   postgres:
     image: postgres:14

@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from netbox.views import generic
-from utilities.utils import count_related
 
 from .models import Plug
 from .forms import PlugForm, PlugFilterForm, PlugBulkEditForm

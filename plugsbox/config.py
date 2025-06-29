@@ -11,5 +11,4 @@ class PlugsboxConfig(PluginConfig):
     base_url = 'plugsbox'
     required_settings = []
     default_settings = {}
-
-config = PlugsboxConfig
+    menu_items = 'plugsbox.navigation.menu_items'

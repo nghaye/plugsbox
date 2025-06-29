@@ -1,0 +1,131 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug_list' %}">Prises Réseau</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Informations Générales</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Nom</th>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Site</th>
+                        <td>
+                            {% if object.site %}
+                                <a href="{{ object.site.get_absolute_url }}">{{ object.site }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Emplacement</th>
+                        <td>
+                            {% if object.location %}
+                                <a href="{{ object.location.get_absolute_url }}">{{ object.location }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Statut</th>
+                        <td>
+                            {% if object.status %}
+                                <span class="badge badge-{{ object.get_status_color }}">
+                                    {{ object.get_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Contact</th>
+                        <td>
+                            {% if object.contact %}
+                                <a href="{{ object.contact.get_absolute_url }}">{{ object.contact }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Tenant</th>
+                        <td>
+                            {% if object.tenant %}
+                                <a href="{{ object.tenant.get_absolute_url }}">{{ object.tenant }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Configuration Réseau</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Type d'interface</th>
+                        <td>
+                            {% if object.interfaceconfig %}
+                                <span class="badge badge-info">
+                                    {{ object.get_interfaceconfig_display }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">VLAN</th>
+                        <td>
+                            {% if object.vlan %}
+                                <a href="{{ object.vlan.get_absolute_url }}">{{ object.vlan }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Adresse IP</th>
+                        <td>
+                            {% if object.ip_address %}
+                                <a href="{{ object.ip_address.get_absolute_url }}">{{ object.ip_address }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        {% if object.description %}
+        <div class="card">
+            <h5 class="card-header">Description</h5>
+            <div class="card-body">
+                {{ object.description|markdown }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

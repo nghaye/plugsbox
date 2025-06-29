@@ -1,0 +1,64 @@
+{% extends 'generic/object_edit.html' %}
+{% load form_helpers %}
+
+{% block title %}
+    {% if object.pk %}
+        Éditer {{ object.name }}
+    {% else %}
+        Ajouter une Prise Réseau
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug_list' %}">Prises Réseau</a>
+    </li>
+    {% if object.pk %}
+        <li class="breadcrumb-item">
+            <a href="{% url 'plugins:plugsbox:plug' pk=object.pk %}">{{ object.name }}</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block form %}
+<div class="row">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Informations Générales</h5>
+            <div class="card-body">
+                {% render_field form.name %}
+                {% render_field form.site %}
+                {% render_field form.location %}
+                {% render_field form.status %}
+                {% render_field form.contact %}
+                {% render_field form.tenant %}
+                {% render_field form.tenant_group %}
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Configuration Réseau</h5>
+            <div class="card-body">
+                {% render_field form.interfaceconfig %}
+                {% render_field form.vlan %}
+                {% render_field form.ip_address %}
+            </div>
+        </div>
+        <div class="card">
+            <h5 class="card-header">Description</h5>
+            <div class="card-body">
+                {% render_field form.description %}
+                {% render_field form.comments %}
+            </div>
+        </div>
+        <div class="card">
+            <h5 class="card-header">Tags</h5>
+            <div class="card-body">
+                {% render_field form.tags %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

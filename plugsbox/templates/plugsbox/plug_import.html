@@ -1,0 +1,55 @@
+{% extends 'import_table.html' %}
+
+{% block title %}Importer des Prises Réseau{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:plug_list' %}">Prises Réseau</a>
+    </li>
+{% endblock %}
+
+{% block content_title %}
+    <h1>Importer des Prises Réseau</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <h5 class="card-header">Format CSV</h5>
+                <div class="card-body">
+                    <p>Utilisez le format CSV suivant pour importer vos prises réseau :</p>
+                    <pre><code>name,site,location,status,interfaceconfig,contact,tenant,vlan,ip_address,description
+"Prise-001","Site Principal","Salle 101","operational","dhcp","contact1","tenant1","VLAN-100","192.168.1.10","Description de la prise"</code></pre>
+                    
+                    <h6>Champs obligatoires :</h6>
+                    <ul>
+                        <li><strong>name</strong> : Nom unique de la prise</li>
+                        <li><strong>site</strong> : Nom du site (doit exister dans NetBox)</li>
+                    </ul>
+                    
+                    <h6>Valeurs possibles pour le statut :</h6>
+                    <ul>
+                        <li>operational</li>
+                        <li>needs_patching</li>
+                        <li>needs_configuration</li>
+                        <li>decommissioned</li>
+                        <li>planned</li>
+                    </ul>
+                    
+                    <h6>Types de configuration d'interface :</h6>
+                    <ul>
+                        <li>dhcp</li>
+                        <li>static</li>
+                        <li>trunk</li>
+                        <li>uplink</li>
+                        <li>access_point</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{ block.super }}
+{% endblock %}
