@@ -1,0 +1,62 @@
+# Python
+###################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual Environments
+.env
+env/
+venv/
+
+
+# Django
+###################
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Fichiers statiques et médias collectés
+# Ces fichiers sont générés et ne doivent pas être versionnés.
+media/
+staticfiles/
+
+
+# NetBox
+###################
+# Rapports personnalisés
+reports/
+
+
+# Fichiers de configuration locaux
+###################
+# Fichier de configuration local qui peut surcharger les paramètres
+# pour le développement, et qui ne doit jamais être commité.
+local_settings.py
+
+
+# Fichiers IDE et éditeurs
+###################
+.idea/
+.vscode/
+*.swp
+*.swo
+
+
+# Tests
+###################
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+
+
+# macOS
+###################
+.DS_Store

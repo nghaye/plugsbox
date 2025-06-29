@@ -1,0 +1,90 @@
+GET http://127.0.0.1:8002/api/plugins/vulnerabilities/knownvulnerability
+accept: application/json
+Authorization: Token 3c9e96a6855b60f847b9f817333ecc3853c3f7b9
+
+###
+GET http://127.0.0.1:8002/api/plugins/vulnerabilities/knownvulnerability?plugin_id=999111
+accept: application/json
+Authorization: Token 3c9e96a6855b60f847b9f817333ecc3853c3f7b9
+
+###
+POST http://127.0.0.1:8002/api/plugins/vulnerabilities/knownvulnerability/
+accept: application/json
+Content-Type: application/json
+Authorization: Token 3c9e96a6855b60f847b9f817333ecc3853c3f7b9
+
+{
+  "plugin_id": 999112,
+  "cve": "cve",
+  "cvss_v2": 9.9,
+  "risk": "high",
+  "name": "string",
+  "synopsis": "string",
+  "description": "string",
+  "solution": "string"
+}
+
+
+###
+GET http://127.0.0.1:8002/api/plugins/vulnerabilities/vulnerability?host=toto123
+accept: application/json
+Authorization: Token 3c9e96a6855b60f847b9f817333ecc3853c3f7b9
+
+###
+POST http://127.0.0.1:8002/api/plugins/vulnerabilities/vulnerability/
+accept: application/json
+Content-Type: application/json
+Authorization: Token 3c9e96a6855b60f847b9f817333ecc3853c3f7b9
+
+{
+  "host_id": 12,
+  "plugin_id":  214,
+  "status" : "Active"
+}
+
+###
+PATCH http://127.0.0.1:8002/api/plugins/vulnerabilities/host/32/
+accept: application/json
+Content-Type: application/json
+Authorization: Token 62367705b900816e5dc3ab6c6c4c3b4b2e2b9931
+
+{
+  "last_scan" : "2021-01-01"
+}
+
+###
+GET http://127.0.0.1:8002/api/plugins/vulnerabilities/host/?tags=1
+accept: application/json
+Authorization: Token 62367705b900816e5dc3ab6c6c4c3b4b2e2b9931
+
+###
+POST http://127.0.0.1:8002/api/extras/tags/
+accept: application/json
+Content-Type: application/json
+Authorization: Token e3ef1667daadc1ddf8df37ce96ed5fdc63a641d2
+
+{
+  "name" : "tagapi",
+  "slug" : "tagapi",
+  "color" : "ff9933"
+}
+
+###
+PATCH http://127.0.0.1:8002/api/plugins/vulnerabilities/vulnerability/139236/
+accept: application/json
+Content-Type: application/json
+Authorization: Token 62367705b900816e5dc3ab6c6c4c3b4b2e2b9931
+
+{
+  "status" : "Inactive"
+}
+
+###
+DELETE http://127.0.0.1:8002/api/ipam/ip-addresses/2129/
+accept: application/json
+Authorization: Token 62367705b900816e5dc3ab6c6c4c3b4b2e2b9931
+
+###
+GET http://127.0.0.1:8002/api/ipam/ip-addresses/
+accept: application/json
+Authorization: Token 62367705b900816e5dc3ab6c6c4c3b4b2e2b9931
