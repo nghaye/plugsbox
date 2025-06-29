@@ -9,7 +9,7 @@ from tenancy.models import Contact, Tenant
 from .choices import PlugStatusChoices, PlugTypeChoices
 
 
-class Plug(NetBoxModel, CableTermination):
+class Plug(CableTermination, NetBoxModel):
     """
     Représente une prise réseau sur le campus.
     """
