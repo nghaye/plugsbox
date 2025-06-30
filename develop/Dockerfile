@@ -26,9 +26,11 @@ RUN git clone --single-branch --branch ${netbox_ver} https://github.com/netbox-c
 # -------------------------------------------------------------------------------------
 # Install Netbox Plugin
 # -------------------------------------------------------------------------------------
-RUN mkdir -p /source
-WORKDIR /source
-COPY . /source
+RUN mkdir -p /source/plugsbox/plugsbox/
+WORKDIR /source/plugsbox
+COPY plugsbox /source/plugsbox/plugsbox/
+COPY setup.py /source/plugsbox
+COPY MANIFEST.in /source/plugsbox
 
 #RUN pip install -r requirements.txt
 RUN python setup.py develop

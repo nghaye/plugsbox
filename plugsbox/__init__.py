@@ -12,7 +12,7 @@ class PlugsboxConfig(PluginConfig):
     base_url = 'plugsbox'
     required_settings = []
     default_settings = {}
-    menu_items = 'plugsbox.navigation.menu_items'
+    menu_items = 'navigation.menu_items'
 
 
 config = PlugsboxConfig

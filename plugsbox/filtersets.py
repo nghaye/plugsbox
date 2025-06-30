@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from dcim.models import Location, Site
+from dcim.models import Site
 from ipam.models import VLAN
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.models import Contact, Tenant
@@ -33,15 +33,9 @@ class PlugFilterSet(NetBoxModelFilterSet):
         to_field_name='slug',
         label='Bâtiment (slug)',
     )
-    location_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=Location.objects.all(),
-        label='Local (ID)',
-    )
-    location = django_filters.ModelMultipleChoiceFilter(
-        field_name='location__slug',
-        queryset=Location.objects.all(),
-        to_field_name='slug',
-        label='Local (slug)',
+    location = django_filters.CharFilter(
+        lookup_expr='icontains',
+        label='Local'
     )
     tenant_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Tenant.objects.all(),

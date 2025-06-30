@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from dcim.models import CableTermination, Location, Site
+from dcim.models import CableTermination, Site
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
@@ -38,12 +38,9 @@ class Plug(CableTermination, NetBoxModel):
         related_name='plugs',
         verbose_name="Bâtiment"
     )
-    location = models.ForeignKey(
-        to=Location,
-        on_delete=models.PROTECT,
-        related_name='plugs',
+    location = models.CharField(
+        max_length=200,
         blank=True,
-        null=True,
         verbose_name="Local"
     )
     ip_address = models.OneToOneField(

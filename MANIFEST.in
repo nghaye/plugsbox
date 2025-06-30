@@ -1,6 +1,8 @@
 include README.md
 include LICENSE
+include *.py
 recursive-include plugsbox/static *
 recursive-include plugsbox/templates *
+recursive-include plugsbox/migrations *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

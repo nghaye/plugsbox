@@ -1,5 +1,53 @@
 {% extends 'generic/object_edit.html' %}
 {% load form_helpers %}
+{% load static %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const interfaceConfigField = document.getElementById('id_interfaceconfig');
+            const ipAddressField = document.getElementById('id_ip_address');
+            const vlanField = document.getElementById('id_vlan');
+            const ipAddressRow = ipAddressField ? ipAddressField.closest('.mb-3') : null;
+            const vlanRow = vlanField ? vlanField.closest('.mb-3') : null;
+
+            if (!interfaceConfigField) {
+                return;
+            }
+
+            function toggleFields() {
+                const selectedValue = interfaceConfigField.value;
+                
+                // IP Address field - only visible for 'static'
+                if (ipAddressField && ipAddressRow) {
+                    if (selectedValue === 'static') {
+                        ipAddressRow.style.display = '';
+                    } else {
+                        ipAddressRow.style.display = 'none';
+                        ipAddressField.value = '';
+                    }
+                }
+                
+                // VLAN field - visible for 'static' and 'dhcp'
+                if (vlanField && vlanRow) {
+                    if (selectedValue === 'static' || selectedValue === 'dhcp') {
+                        vlanRow.style.display = '';
+                    } else {
+                        vlanRow.style.display = 'none';
+                        vlanField.value = '';
+                    }
+                }
+            }
+
+            // Initial state
+            toggleFields();
+
+            // Listen for changes
+            interfaceConfigField.addEventListener('change', toggleFields);
+        });
+    </script>
+{% endblock %}
 
 {% block title %}
     {% if object.pk %}
@@ -30,9 +78,9 @@
                 {% render_field form.name %}
                 {% render_field form.site %}
                 {% render_field form.location %}
-                {% render_field form.status %}
-                {% render_field form.contact %}
                 {% render_field form.tenant %}
+                {% render_field form.contact %}
+                {% render_field form.status %}
             </div>
         </div>
     </div>

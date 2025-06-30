@@ -1,6 +1,6 @@
 from django import forms
 
-from dcim.models import Location, Site
+from dcim.models import Site
 from ipam.models import IPAddress, VLAN
 from netbox.forms import NetBoxModelForm
 from tenancy.forms import ContactModelFilterForm, TenancyForm
@@ -20,18 +20,24 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         queryset=Site.objects.all(),
         label='Bâtiment'
     )
-    location = DynamicModelChoiceField(
-        queryset=Location.objects.all(),
+    location = forms.CharField(
+        max_length=200,
         required=False,
-        query_params={
-            'site_id': '$site'
-        },
         label='Local'
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
+        required=False,
+        label='Gestionnaire'
     )
     contact = DynamicModelChoiceField(
         queryset=Contact.objects.all(),
         required=False,
         label='Personne de contact'
+    )
+    interfaceconfig = forms.ChoiceField(
+        choices=PlugTypeChoices,
+        label='Configuration'
     )
     ip_address = DynamicModelChoiceField(
         queryset=IPAddress.objects.all(),
@@ -84,12 +90,9 @@ class PlugFilterForm(ContactModelFilterForm):
         required=False,
         label='Bâtiment'
     )
-    location = DynamicModelChoiceField(
-        queryset=Location.objects.all(),
+    location = forms.CharField(
+        max_length=200,
         required=False,
-        query_params={
-            'site_id': '$site'
-        },
         label='Local'
     )
     status = forms.MultipleChoiceField(
@@ -128,12 +131,9 @@ class PlugBulkEditForm(NetBoxModelForm):
         required=False,
         label='Bâtiment'
     )
-    location = DynamicModelChoiceField(
-        queryset=Location.objects.all(),
+    location = forms.CharField(
+        max_length=200,
         required=False,
-        query_params={
-            'site_id': '$site'
-        },
         label='Local'
     )
     tenant = DynamicModelChoiceField(
