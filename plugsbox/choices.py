@@ -8,6 +8,7 @@ class PlugTypeChoices(ChoiceSet):
     TYPE_DHCP = 'dhcp'
     TYPE_TRUNK = 'trunk'
     TYPE_AP = 'ap'
+    TYPE_MAB = 'mab'
 
     CHOICES = (
         (TYPE_UPLINK, 'Uplink'),
@@ -15,6 +16,7 @@ class PlugTypeChoices(ChoiceSet):
         (TYPE_DHCP, 'DHCP'),
         (TYPE_TRUNK, 'Trunk'),
         (TYPE_AP, 'Access Point'),
+        (TYPE_MAB, 'MAB'),
     )
 
 

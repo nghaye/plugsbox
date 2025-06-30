@@ -57,6 +57,7 @@ class Plug(CableTermination, NetBoxModel):
     interfaceconfig = models.CharField(
         max_length=50,
         choices=PlugTypeChoices,
+        default=PlugTypeChoices.TYPE_MAB,
         verbose_name="Type de configuration"
     )
     vlan = models.ForeignKey(

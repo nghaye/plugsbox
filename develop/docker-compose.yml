@@ -36,6 +36,7 @@ services:
     env_file: dev.env
     volumes:
       - pgdata_plugsbox:/var/lib/postgresql/data
+      - ../plugsbox:/source/plugsbox/plugsbox
   redis:
     image: redis:5-alpine
     command:
