@@ -7,21 +7,28 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const interfaceConfigField = document.getElementById('id_interfaceconfig');
+            const statusField = document.getElementById('id_status');
             const ipAddressField = document.getElementById('id_ip_address');
             const vlanField = document.getElementById('id_vlan');
+            const switchField = document.getElementById('id_switch');
+            const interfaceField = document.getElementById('id_interface');
+            
             const ipAddressRow = ipAddressField ? ipAddressField.closest('.mb-3') : null;
             const vlanRow = vlanField ? vlanField.closest('.mb-3') : null;
+            const switchRow = switchField ? switchField.closest('.mb-3') : null;
+            const interfaceRow = interfaceField ? interfaceField.closest('.mb-3') : null;
 
-            if (!interfaceConfigField) {
+            if (!interfaceConfigField || !statusField) {
                 return;
             }
 
             function toggleFields() {
-                const selectedValue = interfaceConfigField.value;
+                const interfaceConfigValue = interfaceConfigField.value;
+                const statusValue = statusField.value;
                 
                 // IP Address field - only visible for 'static'
                 if (ipAddressField && ipAddressRow) {
-                    if (selectedValue === 'static') {
+                    if (interfaceConfigValue === 'static') {
                         ipAddressRow.style.display = '';
                     } else {
                         ipAddressRow.style.display = 'none';
@@ -31,11 +38,30 @@
                 
                 // VLAN field - visible for 'static' and 'dhcp'
                 if (vlanField && vlanRow) {
-                    if (selectedValue === 'static' || selectedValue === 'dhcp') {
+                    if (interfaceConfigValue === 'static' || interfaceConfigValue === 'dhcp') {
                         vlanRow.style.display = '';
                     } else {
                         vlanRow.style.display = 'none';
                         vlanField.value = '';
+                    }
+                }
+                
+                // Switch and Interface fields - hidden when status is 'a-patcher'
+                if (switchField && switchRow) {
+                    if (statusValue === 'a-patcher') {
+                        switchRow.style.display = 'none';
+                        switchField.value = '';
+                    } else {
+                        switchRow.style.display = '';
+                    }
+                }
+                
+                if (interfaceField && interfaceRow) {
+                    if (statusValue === 'a-patcher') {
+                        interfaceRow.style.display = 'none';
+                        interfaceField.value = '';
+                    } else {
+                        interfaceRow.style.display = '';
                     }
                 }
             }
@@ -45,6 +71,53 @@
 
             // Listen for changes
             interfaceConfigField.addEventListener('change', toggleFields);
+            statusField.addEventListener('change', toggleFields);
+            
+            // Form validation on submit
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const statusValue = statusField.value;
+                    const switchValue = switchField ? switchField.value : '';
+                    const interfaceValue = interfaceField ? interfaceField.value : '';
+                    
+                    // Statuts qui nécessitent switch et interface
+                    const statusesRequiringConnection = [
+                        'operationnel',
+                        'a-configurer', 
+                        'verifier-patching',
+                        'verifier-fluke',
+                        'a-supprimer'
+                    ];
+                    
+                    if (statusesRequiringConnection.includes(statusValue)) {
+                        let errors = [];
+                        
+                        if (!switchValue) {
+                            errors.push('Le champ Switch est obligatoire pour ce statut.');
+                        }
+                        
+                        if (!interfaceValue) {
+                            errors.push('Le champ Interface est obligatoire pour ce statut.');
+                        }
+                        
+                        if (errors.length > 0) {
+                            e.preventDefault();
+                            alert('Erreur de validation :\n' + errors.join('\n'));
+                            
+                            // Afficher les champs s'ils sont masqués pour permettre la correction
+                            if (switchRow && switchRow.style.display === 'none') {
+                                switchRow.style.display = '';
+                            }
+                            if (interfaceRow && interfaceRow.style.display === 'none') {
+                                interfaceRow.style.display = '';
+                            }
+                            
+                            return false;
+                        }
+                    }
+                });
+            }
         });
     </script>
 {% endblock %}
@@ -80,16 +153,18 @@
                 {% render_field form.location %}
                 {% render_field form.tenant %}
                 {% render_field form.contact %}
-                {% render_field form.status %}
             </div>
         </div>
         
         <div class="card mt-3">
-            <h5 class="card-header">Configuration Réseau</h5>
+            <h5 class="card-header">Configuration</h5>
             <div class="card-body">
                 {% render_field form.interfaceconfig %}
                 {% render_field form.vlan %}
                 {% render_field form.ip_address %}
+                {% render_field form.status %}
+                {% render_field form.switch %}
+                {% render_field form.interface %}
             </div>
         </div>
         

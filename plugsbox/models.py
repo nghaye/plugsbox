@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from django.db import models
 from django.urls import reverse
 
-from dcim.models import Site
+from dcim.models import Device, Interface, Site
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
@@ -95,6 +95,25 @@ class Plug(NetBoxModel):
         #default=default_activation_date,
         verbose_name="Date d'activation souhaitée",
         help_text="Date à partir de laquelle la prise devrait être activée"
+    )
+    # Switch et interface associés
+    switch = models.ForeignKey(
+        to=Device,
+        on_delete=models.SET_NULL,
+        related_name='plugs',
+        blank=True,
+        null=True,
+        verbose_name="Switch",
+        help_text="Switch auquel la prise est connectée"
+    )
+    interface = models.ForeignKey(
+        to=Interface,
+        on_delete=models.SET_NULL,
+        related_name='plugs',
+        blank=True,
+        null=True,
+        verbose_name="Interface",
+        help_text="Interface du switch à laquelle la prise est connectée"
     )
 
     class Meta:

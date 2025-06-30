@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from dcim.api.serializers import DeviceSerializer, InterfaceSerializer
 from dcim.api.serializers_.sites import SiteSerializer
 from ipam.api.serializers_.ip import IPAddressSerializer
 from ipam.api.serializers_.vlans import VLANSerializer
@@ -19,13 +20,15 @@ class PlugSerializer(NetBoxModelSerializer):
     contact = ContactSerializer(required=False, allow_null=True, read_only=True)
     ip_address = IPAddressSerializer(required=False, allow_null=True, read_only=True)
     vlan = VLANSerializer(required=False, allow_null=True, read_only=True)
+    switch = DeviceSerializer(required=False, allow_null=True, read_only=True)
+    interface = InterfaceSerializer(required=False, allow_null=True, read_only=True)
 
     class Meta:
         model = Plug
         fields = [
             'id', 'url', 'display', 'name', 'site', 'location', 'tenant', 
             'contact', 'status', 'interfaceconfig', 'ip_address', 'vlan', 
-            'activation_date', 'legacy_id', 'comments', 'tags', 'custom_fields', 'created', 
+            'switch', 'interface', 'activation_date', 'legacy_id', 'comments', 'tags', 'custom_fields', 'created', 
             'last_updated'
         ]
 

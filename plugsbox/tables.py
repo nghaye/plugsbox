@@ -37,14 +37,22 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         verbose_name='VLAN'
     )
     legacy_id = tables.Column(
-        verbose_name='ID ancien système'
+        verbose_name='ID Plugs'
     )
     contact = tables.Column(
         linkify=True,
         verbose_name='Contact'
     )
     activation_date = tables.DateColumn(
-        verbose_name="Date d'activation"
+        verbose_name="Activation Souhaitée"
+    )
+    switch = tables.Column(
+        linkify=True,
+        verbose_name='Switch'
+    )
+    interface = tables.Column(
+        linkify=True,
+        verbose_name='Interface'
     )
     comments = columns.MarkdownColumn(
         verbose_name='Commentaire'
@@ -54,10 +62,10 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         model = Plug
         fields = (
             'pk', 'id', 'name', 'site', 'location', 'tenant', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'activation_date', 'legacy_id', 'comments', 
+            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id', 'comments', 
             'created', 'last_updated',
         )
         default_columns = (
             'name', 'site', 'location', 'tenant', 'contact', 'status', 'interfaceconfig', 
-            'ip_address', 'vlan', 'activation_date',
+            'ip_address', 'vlan', 'switch', 'interface', 'activation_date',
         )

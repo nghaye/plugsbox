@@ -1,6 +1,6 @@
 from django import forms
 
-from dcim.models import Site
+from dcim.models import Device, Interface, Site
 from ipam.models import IPAddress, VLAN
 from netbox.forms import NetBoxModelForm
 from tenancy.forms import ContactModelFilterForm, TenancyForm
@@ -52,6 +52,22 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         },
         label='VLAN'
     )
+    switch = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site'
+        },
+        label='Switch'
+    )
+    interface = DynamicModelChoiceField(
+        queryset=Interface.objects.all(),
+        required=False,
+        query_params={
+            'device_id': '$switch'
+        },
+        label='Interface'
+    )
     activation_date = forms.DateField(
         required=False,
         label="Date d'activation souhaitée",
@@ -65,7 +81,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         model = Plug
         fields = [
             'name', 'site', 'location', 'tenant', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'activation_date', 'comments',
+            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'comments',
         ]
         widgets = {
             'status': forms.Select,
@@ -83,7 +99,7 @@ class PlugFilterForm(ContactModelFilterForm):
     model = Plug
     field_order = [
         'q', 'name', 'site', 'location', 'tenant', 'contact', 'status', 
-        'interfaceconfig', 'vlan', 'activation_date', 'legacy_id',
+        'interfaceconfig', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id',
     ]
 
     name = forms.CharField(
@@ -121,6 +137,19 @@ class PlugFilterForm(ContactModelFilterForm):
         required=False,
         label="Date d'activation souhaitée",
         widget=forms.DateInput(attrs={'type': 'date'})
+    )
+    switch = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site'
+        },
+        label='Switch'
+    )
+    interface = DynamicModelChoiceField(
+        queryset=Interface.objects.all(),
+        required=False,
+        label='Interface'
     )
     legacy_id = forms.IntegerField(
         required=False,
@@ -178,11 +207,24 @@ class PlugBulkEditForm(NetBoxModelForm):
         label="Date d'activation souhaitée",
         widget=forms.DateInput(attrs={'type': 'date'})
     )
+    switch = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site'
+        },
+        label='Switch'
+    )
+    interface = DynamicModelChoiceField(
+        queryset=Interface.objects.all(),
+        required=False,
+        label='Interface'
+    )
     comments = CommentField(
         label='Commentaire'
     )
 
     class Meta:
         nullable_fields = [
-            'location', 'contact', 'ip_address', 'vlan', 'activation_date', 'comments',
+            'location', 'contact', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'comments',
         ]

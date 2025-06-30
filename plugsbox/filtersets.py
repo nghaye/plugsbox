@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from dcim.models import Site
+from dcim.models import Device, Interface, Site
 from ipam.models import VLAN
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.models import Contact, Tenant
@@ -63,6 +63,26 @@ class PlugFilterSet(NetBoxModelFilterSet):
         queryset=VLAN.objects.all(),
         label='VLAN (ID)',
     )
+    switch_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Device.objects.all(),
+        label='Switch (ID)',
+    )
+    switch = django_filters.ModelMultipleChoiceFilter(
+        field_name='switch__name',
+        queryset=Device.objects.all(),
+        to_field_name='name',
+        label='Switch (nom)',
+    )
+    interface_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Interface.objects.all(),
+        label='Interface (ID)',
+    )
+    interface = django_filters.ModelMultipleChoiceFilter(
+        field_name='interface__name',
+        queryset=Interface.objects.all(),
+        to_field_name='name',
+        label='Interface (nom)',
+    )
     activation_date = django_filters.DateFilter(
         label="Date d'activation souhaitée"
     )
@@ -74,7 +94,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
         model = Plug
         fields = [
             'id', 'name', 'site', 'location', 'tenant', 'contact', 
-            'status', 'interfaceconfig', 'vlan', 'activation_date', 'legacy_id',
+            'status', 'interfaceconfig', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id',
         ]
 
     def search(self, queryset, name, value):
@@ -89,6 +109,8 @@ class PlugFilterSet(NetBoxModelFilterSet):
             Q(location__name__icontains=value) |
             Q(tenant__name__icontains=value) |
             Q(contact__name__icontains=value) |
+            Q(switch__name__icontains=value) |
+            Q(interface__name__icontains=value) |
             Q(comments__icontains=value)
         )
         return queryset.filter(qs_filter)
