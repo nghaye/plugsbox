@@ -79,7 +79,9 @@ class Plug(CableTermination, NetBoxModel):
     )
     # Ajout de l'ID vers l'ancienne DB Plugs
     legacy_id = models.IntegerField(
-        verbose_name="ID dans l'ancienne base de données",
+        blank=True,
+        null=True,
+        verbose_name="ID PLUGS",
         help_text="Identifiant dans l'ancienne base de données Plugs"
     )
 

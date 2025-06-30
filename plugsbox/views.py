@@ -6,6 +6,7 @@ from netbox.views import generic
 from .models import Plug
 from .forms import PlugForm, PlugFilterForm, PlugBulkEditForm
 from .tables import PlugTable
+from .filtersets import PlugFilterSet
 
 
 class PlugListView(generic.ObjectListView):
@@ -15,7 +16,7 @@ class PlugListView(generic.ObjectListView):
     queryset = Plug.objects.prefetch_related(
         'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
     )
-    filterset = PlugFilterForm
+    filterset = PlugFilterSet
     filterset_form = PlugFilterForm
     table = PlugTable
 
@@ -47,6 +48,7 @@ class PlugEditView(generic.ObjectEditView):
     """
     queryset = Plug.objects.all()
     form = PlugForm
+    template_name = 'plugsbox/plug_edit.html'
 
 
 class PlugDeleteView(generic.ObjectDeleteView):
@@ -71,7 +73,7 @@ class PlugBulkEditView(generic.BulkEditView):
     queryset = Plug.objects.prefetch_related(
         'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
     )
-    filterset = PlugFilterForm
+    filterset = PlugFilterSet
     table = PlugTable
     form = PlugBulkEditForm
 
@@ -83,5 +85,5 @@ class PlugBulkDeleteView(generic.BulkDeleteView):
     queryset = Plug.objects.prefetch_related(
         'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
     )
-    filterset = PlugFilterForm
+    filterset = PlugFilterSet
     table = PlugTable

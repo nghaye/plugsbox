@@ -54,12 +54,15 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         model = Plug
         fields = [
             'name', 'site', 'location', 'tenant', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'legacy_id', 'comments',
+            'interfaceconfig', 'ip_address', 'vlan', 'comments',
         ]
         widgets = {
             'status': forms.Select,
             'interfaceconfig': forms.Select,
         }
+
+    class Media:
+        js = ('plugsbox/js/plug_form.js',)
 
 
 class PlugFilterForm(ContactModelFilterForm):
