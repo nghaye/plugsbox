@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+recursive-include plugsbox/static *
+recursive-include plugsbox/templates *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

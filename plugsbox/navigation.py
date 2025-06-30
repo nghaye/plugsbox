@@ -1,4 +1,4 @@
-from extras.plugins import PluginMenuItem
+from netbox.plugins import PluginMenuItem, PluginMenuButton
 
 menu_items = (
     PluginMenuItem(
@@ -6,14 +6,16 @@ menu_items = (
         link_text='Prises Réseau',
         permissions=['plugsbox.view_plug'],
         buttons=(
-            PluginMenuItem(
+            PluginMenuButton(
                 link='plugins:plugsbox:plug_add',
-                link_text='Ajouter',
+                title='Ajouter',
+                icon_class='mdi mdi-plus-thick',
                 permissions=['plugsbox.add_plug'],
             ),
-            PluginMenuItem(
+            PluginMenuButton(
                 link='plugins:plugsbox:plug_import',
-                link_text='Importer',
+                title='Importer',
+                icon_class='mdi mdi-upload',
                 permissions=['plugsbox.add_plug'],
             ),
         )
