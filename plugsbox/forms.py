@@ -27,7 +27,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
     )
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(),
-        required=False,
+        required=True,
         label='Gestionnaire'
     )
     contact = DynamicModelChoiceField(

@@ -14,7 +14,7 @@ class PlugListView(generic.ObjectListView):
     Vue pour l'affichage de la liste des prises réseau.
     """
     queryset = Plug.objects.prefetch_related(
-        'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
+        'site', 'tenant', 'contact', 'ip_address', 'vlan'
     )
     filterset = PlugFilterSet
     filterset_form = PlugFilterForm
@@ -26,7 +26,7 @@ class PlugView(generic.ObjectView):
     Vue pour l'affichage du détail d'une prise réseau.
     """
     queryset = Plug.objects.prefetch_related(
-        'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
+        'site', 'tenant', 'contact', 'ip_address', 'vlan'
     )
 
     def get_extra_context(self, request, instance):
@@ -71,7 +71,7 @@ class PlugBulkEditView(generic.BulkEditView):
     Vue pour l'édition en masse des prises réseau.
     """
     queryset = Plug.objects.prefetch_related(
-        'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
+        'site', 'tenant', 'contact', 'ip_address', 'vlan'
     )
     filterset = PlugFilterSet
     table = PlugTable
@@ -83,7 +83,7 @@ class PlugBulkDeleteView(generic.BulkDeleteView):
     Vue pour la suppression en masse des prises réseau.
     """
     queryset = Plug.objects.prefetch_related(
-        'site', 'location', 'tenant', 'contact', 'ip_address', 'vlan'
+        'site', 'tenant', 'contact', 'ip_address', 'vlan'
     )
     filterset = PlugFilterSet
     table = PlugTable

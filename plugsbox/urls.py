@@ -25,4 +25,7 @@ urlpatterns = [
     
     # Suppression en masse
     path('plugs/delete/', views.PlugBulkDeleteView.as_view(), name='plug_bulk_delete'),
+    
+    # Changelog
+    path('plugs/<int:pk>/changelog/', views.PlugView.as_view(), name='plug_changelog'),
 ]

@@ -19,10 +19,10 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         verbose_name='Bâtiment'
     )
     location = tables.Column(
-        linkify=True,
         verbose_name='Local'
     )
-    status = columns.ChoiceFieldColumn(
+    status = columns.TemplateColumn(
+        template_code='<span class="badge bg-{{ record.get_status_color }}">{{ record.get_status_display }}</span>',
         verbose_name='Statut'
     )
     interfaceconfig = columns.ChoiceFieldColumn(
@@ -39,6 +39,10 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
     legacy_id = tables.Column(
         verbose_name='ID ancien système'
     )
+    contact = tables.Column(
+        linkify=True,
+        verbose_name='Contact'
+    )
     comments = columns.MarkdownColumn(
         verbose_name='Commentaire'
     )
@@ -51,6 +55,6 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
             'created', 'last_updated',
         )
         default_columns = (
-            'name', 'site', 'location', 'tenant', 'status', 'interfaceconfig', 
+            'name', 'site', 'location', 'tenant', 'contact', 'status', 'interfaceconfig', 
             'ip_address', 'vlan',
         )

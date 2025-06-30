@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from dcim.models import CableTermination, Site
+from dcim.models import Site
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
@@ -9,7 +9,7 @@ from tenancy.models import Contact, Tenant
 from .choices import PlugStatusChoices, PlugTypeChoices
 
 
-class Plug(CableTermination, NetBoxModel):
+class Plug(NetBoxModel):
     """
     Représente une prise réseau sur le campus.
     """
@@ -95,9 +95,24 @@ class Plug(CableTermination, NetBoxModel):
         verbose_name_plural = 'Prises'
 
     def __str__(self):
-        if self.location:
-            return f"{self.site.name} / {self.location.name} / {self.name}"
-        return f"{self.site.name} / {self.name}"
+        #if self.location:
+        #    return f"{self.site.name} / {self.location} / {self.name}"
+        return f"{self.site.name} / {self.name} ({self.interfaceconfig})"
 
     def get_absolute_url(self):
         return reverse('plugins:plugsbox:plug', args=[self.pk])
+
+    def get_status_color(self):
+        """Retourne la couleur Bootstrap pour le statut"""
+        color_map = {
+            PlugStatusChoices.STATUS_OPERATIONAL: 'success',  # vert
+            PlugStatusChoices.STATUS_TO_PATCH: 'warning',     # jaune
+            PlugStatusChoices.STATUS_TO_CONFIGURE: 'info',    # bleu
+            PlugStatusChoices.STATUS_DEFECTIVE: 'danger',     # rouge
+            PlugStatusChoices.STATUS_TO_DELETE: 'secondary',  # gris
+            PlugStatusChoices.STATUS_DELETED: 'dark',         # noir
+            PlugStatusChoices.STATUS_VERIFY_PATCHING: 'warning',  # jaune
+            PlugStatusChoices.STATUS_VERIFY_FLUKE: 'warning',     # jaune
+        }
+        return color_map.get(self.status, 'secondary')
+
