@@ -46,9 +46,11 @@
                     }
                 }
                 
-                // Switch and Interface fields - hidden when status is 'a-patcher'
+                // Switch and Interface fields - hidden when status requires cable cleanup
+                const statusesHidingSwitchInterface = ['a-patcher', 'supprimee', 'defectueux'];
+                
                 if (switchField && switchRow) {
-                    if (statusValue === 'a-patcher') {
+                    if (statusesHidingSwitchInterface.includes(statusValue)) {
                         switchRow.style.display = 'none';
                         switchField.value = '';
                     } else {
@@ -57,7 +59,7 @@
                 }
                 
                 if (interfaceField && interfaceRow) {
-                    if (statusValue === 'a-patcher') {
+                    if (statusesHidingSwitchInterface.includes(statusValue)) {
                         interfaceRow.style.display = 'none';
                         interfaceField.value = '';
                     } else {
@@ -90,7 +92,13 @@
                         'a-supprimer'
                     ];
                     
-                    if (statusesRequiringConnection.includes(statusValue)) {
+                    // Statuts qui n'autorisent pas switch et interface
+                    const statusesHidingSwitchInterface = ['a-patcher', 'supprimee', 'defectueux'];
+                    
+                    // Validation seulement pour les statuts qui nécessitent une connexion
+                    // et qui ne sont pas dans les statuts cachant les champs
+                    if (statusesRequiringConnection.includes(statusValue) && 
+                        !statusesHidingSwitchInterface.includes(statusValue)) {
                         let errors = [];
                         
                         if (!switchValue) {

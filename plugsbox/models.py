@@ -284,20 +284,38 @@ class Plug(NetBoxModel):
 
     def save(self, *args, **kwargs):
         """Sauvegarde avec gestion automatique des câbles"""
-        # Récupérer l'ancienne interface si on modifie un objet existant
+        # Récupérer l'ancienne interface et l'ancien statut si on modifie un objet existant
         old_interface = None
+        old_status = None
         if self.pk:
             try:
                 old_instance = Plug.objects.get(pk=self.pk)
                 old_interface = old_instance.interface
+                old_status = old_instance.status
             except Plug.DoesNotExist:
                 pass
+
+        # Vérifier si le statut nécessite la suppression du câble
+        status_requiring_cable_cleanup = [
+            PlugStatusChoices.STATUS_TO_PATCH,
+            PlugStatusChoices.STATUS_DELETED,
+            PlugStatusChoices.STATUS_DEFECTIVE
+        ]
+        
+        # Si le statut change vers un statut qui nécessite la suppression du câble
+        if (old_status and old_status != self.status and 
+            self.status in status_requiring_cable_cleanup):
+            # Nettoyer le câble et remettre à null les champs switch/interface
+            self._cleanup_cable()
+            self.switch = None
+            self.interface = None
 
         # Sauvegarder d'abord l'objet
         super().save(*args, **kwargs)
 
-        # Gérer les câbles selon les cas
-        if self.interface and self.site:
+        # Gérer les câbles selon les cas (seulement si le statut le permet)
+        if (self.status not in status_requiring_cable_cleanup and 
+            self.interface and self.site):
             if old_interface != self.interface:
                 # Interface nouvelle ou modifiée
                 if not self.user_interface:
@@ -310,7 +328,7 @@ class Plug(NetBoxModel):
                     self._create_cable()
                 # Sauvegarder à nouveau pour persister les relations
                 super().save(*args, **kwargs)
-        else:
+        elif not self.interface:
             # Plus d'interface, nettoyer les câbles
             if old_interface:
                 self._cleanup_cable()
