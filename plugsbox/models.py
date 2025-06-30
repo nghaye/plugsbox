@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from django.db import models
 from django.urls import reverse
 
@@ -7,6 +8,11 @@ from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
 
 from .choices import PlugStatusChoices, PlugTypeChoices
+
+
+def default_activation_date():
+    """Retourne la date par défaut pour l'activation (aujourd'hui + 7 jours)"""
+    return date.today() + timedelta(days=7)
 
 
 class Plug(NetBoxModel):
@@ -81,6 +87,14 @@ class Plug(NetBoxModel):
         null=True,
         verbose_name="ID PLUGS",
         help_text="Identifiant dans l'ancienne base de données Plugs"
+    )
+    # Date d'activation souhaitée
+    activation_date = models.DateField(
+        blank=True,
+        null=True,
+        #default=default_activation_date,
+        verbose_name="Date d'activation souhaitée",
+        help_text="Date à partir de laquelle la prise devrait être activée"
     )
 
     class Meta:

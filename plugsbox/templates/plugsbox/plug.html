@@ -90,6 +90,16 @@
                             {% endif %}
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">Date d'activation souhaitée</th>
+                        <td>
+                            {% if object.activation_date %}
+                                {{ object.activation_date|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>

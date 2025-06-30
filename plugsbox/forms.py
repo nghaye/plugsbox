@@ -52,6 +52,11 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         },
         label='VLAN'
     )
+    activation_date = forms.DateField(
+        required=False,
+        label="Date d'activation souhaitée",
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
     comments = CommentField(
         label='Commentaire'
     )
@@ -60,7 +65,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         model = Plug
         fields = [
             'name', 'site', 'location', 'tenant', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'comments',
+            'interfaceconfig', 'ip_address', 'vlan', 'activation_date', 'comments',
         ]
         widgets = {
             'status': forms.Select,
@@ -78,7 +83,7 @@ class PlugFilterForm(ContactModelFilterForm):
     model = Plug
     field_order = [
         'q', 'name', 'site', 'location', 'tenant', 'contact', 'status', 
-        'interfaceconfig', 'vlan', 'legacy_id',
+        'interfaceconfig', 'vlan', 'activation_date', 'legacy_id',
     ]
 
     name = forms.CharField(
@@ -111,6 +116,11 @@ class PlugFilterForm(ContactModelFilterForm):
         queryset=VLAN.objects.all(),
         required=False,
         label='VLAN'
+    )
+    activation_date = forms.DateField(
+        required=False,
+        label="Date d'activation souhaitée",
+        widget=forms.DateInput(attrs={'type': 'date'})
     )
     legacy_id = forms.IntegerField(
         required=False,
@@ -163,11 +173,16 @@ class PlugBulkEditForm(NetBoxModelForm):
         required=False,
         label='VLAN'
     )
+    activation_date = forms.DateField(
+        required=False,
+        label="Date d'activation souhaitée",
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
     comments = CommentField(
         label='Commentaire'
     )
 
     class Meta:
         nullable_fields = [
-            'location', 'contact', 'ip_address', 'vlan', 'comments',
+            'location', 'contact', 'ip_address', 'vlan', 'activation_date', 'comments',
         ]

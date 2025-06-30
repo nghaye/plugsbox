@@ -25,7 +25,7 @@ class PlugSerializer(NetBoxModelSerializer):
         fields = [
             'id', 'url', 'display', 'name', 'site', 'location', 'tenant', 
             'contact', 'status', 'interfaceconfig', 'ip_address', 'vlan', 
-            'legacy_id', 'comments', 'tags', 'custom_fields', 'created', 
+            'activation_date', 'legacy_id', 'comments', 'tags', 'custom_fields', 'created', 
             'last_updated'
         ]
 

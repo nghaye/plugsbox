@@ -63,6 +63,9 @@ class PlugFilterSet(NetBoxModelFilterSet):
         queryset=VLAN.objects.all(),
         label='VLAN (ID)',
     )
+    activation_date = django_filters.DateFilter(
+        label="Date d'activation souhaitée"
+    )
     legacy_id = django_filters.NumberFilter(
         label='ID ancien système'
     )
@@ -71,7 +74,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
         model = Plug
         fields = [
             'id', 'name', 'site', 'location', 'tenant', 'contact', 
-            'status', 'interfaceconfig', 'vlan', 'legacy_id',
+            'status', 'interfaceconfig', 'vlan', 'activation_date', 'legacy_id',
         ]
 
     def search(self, queryset, name, value):
