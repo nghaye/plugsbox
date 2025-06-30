@@ -141,7 +141,7 @@
                         <th scope="row">Statut</th>
                         <td>
                             {% if object.status %}
-                                <span class="badge badge-{{ object.get_status_color }}">
+                                <span class="badge badge-{{ object.get_status_color }} text-white">
                                     {{ object.get_status_display }}
                                 </span>
                             {% else %}

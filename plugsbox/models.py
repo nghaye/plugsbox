@@ -1,8 +1,9 @@
 from datetime import date, timedelta
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
-from dcim.models import Device, Interface, Site
+from dcim.models import Cable, Device, DeviceRole, DeviceType, Interface, Manufacturer, Site
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
@@ -13,6 +14,64 @@ from .choices import PlugStatusChoices, PlugTypeChoices
 def default_activation_date():
     """Retourne la date par défaut pour l'activation (aujourd'hui + 7 jours)"""
     return date.today() + timedelta(days=7)
+
+
+def get_or_create_wall_jacks_manufacturer():
+    """Crée ou récupère le fabricant générique pour les prises murales"""
+    manufacturer, created = Manufacturer.objects.get_or_create(
+        name='Generic Wall Jacks',
+        defaults={
+            'slug': 'generic-wall-jacks',
+            'description': 'Fabricant générique pour les prises réseau murales'
+        }
+    )
+    return manufacturer
+
+
+def get_or_create_wall_jacks_device_type():
+    """Crée ou récupère le type de device générique pour les prises murales"""
+    manufacturer = get_or_create_wall_jacks_manufacturer()
+    device_type, created = DeviceType.objects.get_or_create(
+        manufacturer=manufacturer,
+        model='Wall Jacks Panel',
+        defaults={
+            'slug': 'wall-jacks-panel',
+            'description': 'Panneau virtuel pour les prises réseau murales',
+            'u_height': 0,  # Pas de hauteur rack
+            'is_full_depth': False,
+        }
+    )
+    return device_type
+
+
+def get_or_create_passive_device_role():
+    """Crée ou récupère le rôle de device passif"""
+    device_role, created = DeviceRole.objects.get_or_create(
+        name='Passif',
+        defaults={
+            'slug': 'passif',
+            'color': 'gray',
+            'description': 'Équipement passif (prises murales, panneaux de brassage, etc.)'
+        }
+    )
+    return device_role
+
+
+def get_or_create_wall_jacks_device(site):
+    """Crée ou récupère le device générique pour les prises murales d'un site"""
+    device_type = get_or_create_wall_jacks_device_type()
+    device_role = get_or_create_passive_device_role()
+    device, created = Device.objects.get_or_create(
+        name=f'{site.slug}-prises',
+        site=site,
+        defaults={
+            'device_type': device_type,
+            'role': device_role,
+            'status': 'active',
+            'comments': f'Device virtuel pour les prises murales du site {site.name}'
+        }
+    )
+    return device
 
 
 class Plug(NetBoxModel):
@@ -115,6 +174,26 @@ class Plug(NetBoxModel):
         verbose_name="Interface",
         help_text="Interface du switch à laquelle la prise est connectée"
     )
+    # Interface virtuelle côté utilisateur pour le câble
+    user_interface = models.OneToOneField(
+        to=Interface,
+        on_delete=models.CASCADE,
+        related_name='plug_user_side',
+        blank=True,
+        null=True,
+        verbose_name="Interface utilisateur",
+        help_text="Interface virtuelle représentant la prise côté utilisateur"
+    )
+    # Câble entre la prise et le switch
+    cable = models.OneToOneField(
+        to=Cable,
+        on_delete=models.SET_NULL,
+        related_name='plug_connection',
+        blank=True,
+        null=True,
+        verbose_name="Câble",
+        help_text="Câble connectant la prise au switch"
+    )
 
     class Meta:
         ordering = ('site', 'location', 'name')
@@ -148,4 +227,109 @@ class Plug(NetBoxModel):
             PlugStatusChoices.STATUS_VERIFY_FLUKE: 'warning',     # jaune
         }
         return color_map.get(self.status, 'secondary')
+
+    def _create_user_interface(self):
+        """Crée une interface virtuelle côté utilisateur pour la prise"""
+        if not self.user_interface and self.site:
+            # Récupérer ou créer le device générique pour les prises murales de ce site
+            wall_jacks_device = get_or_create_wall_jacks_device(self.site)
+            
+            # Créer l'interface sur le device générique
+            user_interface = Interface.objects.create(
+                device=wall_jacks_device,
+                name=f"{self.name}",
+                type='1000base-t',  # Type par défaut pour une prise réseau
+                description=f"Prise murale {self.name} - {self.location}"
+            )
+            self.user_interface = user_interface
+            return user_interface
+        return self.user_interface
+
+    def _create_cable(self):
+        """Crée un câble entre l'interface utilisateur et l'interface switch"""
+        if self.interface and self.user_interface and not self.cable:
+            cable = Cable(
+                a_terminations=[self.user_interface],
+                b_terminations=[self.interface],
+                label=f"Câble vers prise {self.name}",
+                type='cat6'  # Type par défaut
+            )
+            cable.save()
+            self.cable = cable
+            return cable
+        return self.cable
+
+    def _update_cable(self, old_interface):
+        """Met à jour le câble existant si l'interface change"""
+        if self.cable and old_interface != self.interface:
+            if self.interface:
+                # Supprimer l'ancien câble
+                self.cable.delete()
+                self.cable = None
+                # Créer un nouveau câble avec la nouvelle interface
+                self._create_cable()
+            else:
+                # Supprimer le câble si plus d'interface
+                self.cable.delete()
+                self.cable = None
+
+    def _cleanup_cable(self):
+        """Supprime le câble et l'interface utilisateur si plus d'interface switch"""
+        if self.cable:
+            self.cable.delete()
+            self.cable = None
+        if self.user_interface:
+            self.user_interface.delete()
+            self.user_interface = None
+
+    def save(self, *args, **kwargs):
+        """Sauvegarde avec gestion automatique des câbles"""
+        # Récupérer l'ancienne interface si on modifie un objet existant
+        old_interface = None
+        if self.pk:
+            try:
+                old_instance = Plug.objects.get(pk=self.pk)
+                old_interface = old_instance.interface
+            except Plug.DoesNotExist:
+                pass
+
+        # Sauvegarder d'abord l'objet
+        super().save(*args, **kwargs)
+
+        # Gérer les câbles selon les cas
+        if self.interface and self.site:
+            if old_interface != self.interface:
+                # Interface nouvelle ou modifiée
+                if not self.user_interface:
+                    self._create_user_interface()
+                if old_interface and self.cable:
+                    # Mettre à jour le câble existant
+                    self._update_cable(old_interface)
+                elif not self.cable:
+                    # Créer un nouveau câble
+                    self._create_cable()
+                # Sauvegarder à nouveau pour persister les relations
+                super().save(*args, **kwargs)
+        else:
+            # Plus d'interface, nettoyer les câbles
+            if old_interface:
+                self._cleanup_cable()
+                super().save(*args, **kwargs)
+
+    def clean(self):
+        """Validation du modèle"""
+        super().clean()
+        
+        # Vérifier que l'interface appartient bien au switch sélectionné
+        if self.interface and self.switch:
+            if self.interface.device != self.switch:
+                raise ValidationError({
+                    'interface': f"L'interface {self.interface} n'appartient pas au switch {self.switch}"
+                })
+
+    def delete(self, *args, **kwargs):
+        """Suppression avec nettoyage des câbles"""
+        # Nettoyer les câbles et interfaces avant suppression
+        self._cleanup_cable()
+        super().delete(*args, **kwargs)
 
