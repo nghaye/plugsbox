@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
-from dcim.models import Cable, Device, DeviceRole, DeviceType, Interface, Manufacturer, Site
+from dcim.models import Cable, Device, DeviceRole, DeviceType, Interface, Manufacturer, Site, FrontPort, RearPort
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
@@ -56,6 +56,69 @@ def get_or_create_passive_device_role():
         }
     )
     return device_role
+
+
+def get_or_create_patch_panel_manufacturer():
+    """Crée ou récupère le fabricant générique pour les répartiteurs"""
+    manufacturer, created = Manufacturer.objects.get_or_create(
+        name='Generic Patch Panel',
+        defaults={
+            'slug': 'generic-patch-panel',
+            'description': 'Fabricant générique pour les répartiteurs'
+        }
+    )
+    return manufacturer
+
+
+def get_or_create_patch_panel_device_type():
+    """Crée ou récupère le type de device générique pour les répartiteurs"""
+    manufacturer = get_or_create_patch_panel_manufacturer()
+    device_type, created = DeviceType.objects.get_or_create(
+        manufacturer=manufacturer,
+        model='Repartiteur',
+        defaults={
+            'slug': 'repartiteur',
+            'description': 'Répartiteur générique',
+            'u_height': 1,
+            'is_full_depth': False,
+        }
+    )
+    return device_type
+
+
+def get_patch_panel_name(switch_name, site_name):
+    """Détermine le nom du répartiteur selon la logique définie"""
+    if len(switch_name) >= 4:
+        # Vérifier si le caractère -2 est 'a' ou 'w' et le caractère -1 est un chiffre
+        if switch_name[-2] in ['a', 'w'] and switch_name[-1].isdigit():
+            # Le caractère -3 est l'id du répartiteur
+            repartiteur_id = switch_name[-3]
+            # La substring [0,-4] est le nom du bâtiment
+            batiment_name = switch_name[:-3]
+            return f"{batiment_name}-{repartiteur_id}"
+    
+    # Sinon prendre juste le nom du bâtiment
+    return site_name
+
+
+def get_or_create_patch_panel_device(switch_name, site):
+    """Crée ou récupère le device répartiteur pour un switch donné"""
+    device_type = get_or_create_patch_panel_device_type()
+    device_role = get_or_create_passive_device_role()
+    
+    patch_panel_name = get_patch_panel_name(switch_name, site.slug)
+    
+    device, created = Device.objects.get_or_create(
+        name=patch_panel_name,
+        site=site,
+        defaults={
+            'device_type': device_type,
+            'role': device_role,
+            'status': 'active',
+            'comments': f'Répartiteur pour les prises du site {site.name}'
+        }
+    )
+    return device
 
 
 def get_or_create_wall_jacks_device(site):
@@ -175,15 +238,15 @@ class Plug(NetBoxModel):
         verbose_name="Interface",
         help_text="Interface du switch à laquelle la prise est connectée"
     )
-    # Interface virtuelle côté utilisateur pour le câble
-    user_interface = models.OneToOneField(
-        to=Interface,
+    # Front port côté utilisateur pour le câble
+    patch_panel_plug = models.OneToOneField(
+        to=FrontPort,
         on_delete=models.CASCADE,
         related_name='plug_user_side',
         blank=True,
         null=True,
-        verbose_name="Interface utilisateur",
-        help_text="Interface virtuelle représentant la prise côté utilisateur"
+        verbose_name="Front port répartiteur",
+        help_text="Front port du répartiteur représentant la prise côté utilisateur"
     )
     # Câble entre la prise et le switch
     cable = models.OneToOneField(
@@ -194,6 +257,16 @@ class Plug(NetBoxModel):
         null=True,
         verbose_name="Câble",
         help_text="Câble connectant la prise au switch"
+    )
+    # Device associé (ex: access point)
+    related_device = models.ForeignKey(
+        to=Device,
+        on_delete=models.SET_NULL,
+        related_name='related_plugs',
+        blank=True,
+        null=True,
+        verbose_name="Device associé",
+        help_text="Device connecté au répartiteur (ex: access point)"
     )
 
     class Meta:
@@ -229,30 +302,63 @@ class Plug(NetBoxModel):
         }
         return color_map.get(self.status, 'secondary')
 
-    def _create_user_interface(self):
-        """Crée une interface virtuelle côté utilisateur pour la prise"""
-        if not self.user_interface and self.site:
-            # Récupérer ou créer le device générique pour les prises murales de ce site
-            wall_jacks_device = get_or_create_wall_jacks_device(self.site)
+    def _create_patch_panel_plug(self):
+        """Crée un front port sur le répartiteur pour la prise"""
+        if not self.patch_panel_plug and self.site and self.switch:
+            # Récupérer ou créer le device répartiteur pour ce switch
+            patch_panel_device = get_or_create_patch_panel_device(self.switch.name, self.site)
             
-            # Créer l'interface sur le device générique
-            user_interface = Interface.objects.create(
-                device=wall_jacks_device,
-                name=f"{self.name}",
-                type='1000base-t',  # Type par défaut pour une prise réseau
-                description=f"Prise murale {self.name} - {self.location}"
+            # Créer d'abord un rear port (obligatoire pour le front port)
+            rear_port, _ = RearPort.objects.get_or_create(
+                device=patch_panel_device,
+                name=f"{self.name}_rear",
+                defaults={
+                    'type': '8p8c',
+                    'positions': 1,
+                    'description': f"Port arrière pour prise {self.name}"
+                }
             )
-            self.user_interface = user_interface
-            return user_interface
-        return self.user_interface
+            
+            # Connecter le rear port au related_device si spécifié
+            if self.related_device:
+                self._connect_rear_port_to_device(rear_port)
+            
+            # Créer le front port associé au rear port
+            patch_panel_plug = FrontPort.objects.create(
+                device=patch_panel_device,
+                name=f"{self.name}",
+                type='8p8c',  # Type RJ45 par défaut
+                rear_port=rear_port,
+                rear_port_position=1,
+                description=f"Port répartiteur pour prise {self.name} - {self.site.name}"
+            )
+            self.patch_panel_plug = patch_panel_plug
+            return patch_panel_plug
+        return self.patch_panel_plug
+
+    def _connect_rear_port_to_device(self, rear_port):
+        """Connecte le rear port au related_device via l'interface avec l'ID le plus faible"""
+        if self.related_device:
+            # Trouver l'interface avec l'ID le plus faible
+            interface = Interface.objects.filter(device=self.related_device).order_by('id').first()
+            
+            if interface:
+                # Créer un câble entre le rear port et l'interface du device
+                cable = Cable(
+                    a_terminations=[rear_port],
+                    b_terminations=[interface],
+                    label=f"{self.site.slug}-{self.name}-{self.related_device.name}",
+                    type='cat6'
+                )
+                cable.save()
 
     def _create_cable(self):
-        """Crée un câble entre l'interface utilisateur et l'interface switch"""
-        if self.interface and self.user_interface and not self.cable:
+        """Crée un câble entre le front port répartiteur et l'interface switch"""
+        if self.interface and self.patch_panel_plug and not self.cable:
             cable = Cable(
-                a_terminations=[self.user_interface],
+                a_terminations=[self.patch_panel_plug],
                 b_terminations=[self.interface],
-                label=f"Câble vers prise {self.name}",
+                label=f"{self.site.slug}-{self.name}",
                 type='cat6'  # Type par défaut
             )
             cable.save()
@@ -275,13 +381,13 @@ class Plug(NetBoxModel):
                 self.cable = None
 
     def _cleanup_cable(self):
-        """Supprime le câble et l'interface utilisateur si plus d'interface switch"""
+        """Supprime le câble et le front port répartiteur si plus d'interface switch"""
         if self.cable:
             self.cable.delete()
             self.cable = None
-        if self.user_interface:
-            self.user_interface.delete()
-            self.user_interface = None
+        # if self.patch_panel_plug:
+        #     self.patch_panel_plug.delete()
+        #     self.patch_panel_plug = None
 
     def save(self, *args, **kwargs):
         """Sauvegarde avec gestion automatique des câbles"""
@@ -316,11 +422,11 @@ class Plug(NetBoxModel):
 
         # Gérer les câbles selon les cas (seulement si le statut le permet)
         if (self.status not in status_requiring_cable_cleanup and 
-            self.interface and self.site):
+            self.interface and self.site and self.switch):
             if old_interface != self.interface:
                 # Interface nouvelle ou modifiée
-                if not self.user_interface:
-                    self._create_user_interface()
+                if not self.patch_panel_plug:
+                    self._create_patch_panel_plug()
                 if old_interface and self.cable:
                     # Mettre à jour le câble existant
                     self._update_cable(old_interface)

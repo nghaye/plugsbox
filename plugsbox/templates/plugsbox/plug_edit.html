@@ -46,6 +46,19 @@
                     }
                 }
                 
+                // Related device field - only visible for 'ap' (access point)
+                const relatedDeviceField = document.getElementById('id_related_device');
+                const relatedDeviceRow = relatedDeviceField ? relatedDeviceField.closest('.mb-3') : null;
+                
+                if (relatedDeviceField && relatedDeviceRow) {
+                    if (interfaceConfigValue === 'ap') {
+                        relatedDeviceRow.style.display = '';
+                    } else {
+                        relatedDeviceRow.style.display = 'none';
+                        relatedDeviceField.value = '';
+                    }
+                }
+                
                 // Switch and Interface fields - hidden when status requires cable cleanup
                 const statusesHidingSwitchInterface = ['a-patcher', 'supprimee', 'defectueux'];
                 
@@ -173,6 +186,7 @@
                 {% render_field form.status %}
                 {% render_field form.switch %}
                 {% render_field form.interface %}
+                {% render_field form.related_device %}
             </div>
         </div>
         

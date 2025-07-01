@@ -69,6 +69,15 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         },
         label='Interface'
     )
+    related_device = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        required=False,
+        query_params={
+            'site_id': '$site'
+        },
+        label='Device associé',
+        help_text='Device connecté au répartiteur (ex: access point)'
+    )
     activation_date = forms.DateField(
         required=False,
         label="Date d'activation souhaitée",
@@ -82,7 +91,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         model = Plug
         fields = [
             'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'comments',
+            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'related_device', 'activation_date', 'comments',
         ]
         widgets = {
             'status': forms.Select,

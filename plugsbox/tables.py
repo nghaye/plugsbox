@@ -58,6 +58,14 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         linkify=True,
         verbose_name='Interface'
     )
+    patch_panel_plug = tables.Column(
+        linkify=True,
+        verbose_name='Port répartiteur'
+    )
+    related_device = tables.Column(
+        linkify=True,
+        verbose_name='Device associé'
+    )
     comments = columns.MarkdownColumn(
         verbose_name='Commentaire'
     )
@@ -66,7 +74,7 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         model = Plug
         fields = (
             'pk', 'id', 'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 
-            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id', 'comments', 
+            'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'patch_panel_plug', 'related_device', 'activation_date', 'legacy_id', 'comments', 
             'created', 'last_updated',
         )
         default_columns = (

@@ -90,12 +90,23 @@ class PlugFilterSet(NetBoxModelFilterSet):
     legacy_id = django_filters.NumberFilter(
         label='ID ancien système'
     )
+    related_device_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='related_device',
+        queryset=Device.objects.all(),
+        label='Device associé (ID)',
+    )
+    related_device = django_filters.ModelMultipleChoiceFilter(
+        field_name='related_device__name',
+        queryset=Device.objects.all(),
+        to_field_name='name',
+        label='Device associé (nom)',
+    )
 
     class Meta:
         model = Plug
         fields = [
             'id', 'name', 'site', 'location', 'gestionnaire', 'contact', 
-            'status', 'interfaceconfig', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id',
+            'status', 'interfaceconfig', 'vlan', 'switch', 'interface', 'related_device', 'activation_date', 'legacy_id',
         ]
 
     def search(self, queryset, name, value):
@@ -112,6 +123,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
             Q(contact__name__icontains=value) |
             Q(switch__name__icontains=value) |
             Q(interface__name__icontains=value) |
+            Q(related_device__name__icontains=value) |
             Q(comments__icontains=value)
         )
         return queryset.filter(qs_filter)

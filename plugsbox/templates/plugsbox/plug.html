@@ -159,6 +159,26 @@
                             {% endif %}
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">Port répartiteur</th>
+                        <td>
+                            {% if object.patch_panel_plug %}
+                                <a href="{{ object.patch_panel_plug.get_absolute_url }}">{{ object.patch_panel_plug }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Device associé</th>
+                        <td>
+                            {% if object.related_device %}
+                                <a href="{{ object.related_device.get_absolute_url }}">{{ object.related_device }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
