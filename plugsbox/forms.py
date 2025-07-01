@@ -56,7 +56,8 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         queryset=Device.objects.all(),
         required=False,
         query_params={
-            'site_id': '$site'
+            'site_id': '$site',
+            'role': 'access'
         },
         label='Switch'
     )
