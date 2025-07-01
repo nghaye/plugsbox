@@ -240,7 +240,7 @@ class GestionnaireForm(NetBoxModelForm):
         help_text="Nom du gestionnaire (sera sluggifié automatiquement)"
     )
     description = forms.CharField(
-        widget=forms.Textarea,
+        max_length=100,
         label='Description',
         help_text="Description du gestionnaire"
     )

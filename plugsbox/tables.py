@@ -21,6 +21,10 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
     location = tables.Column(
         verbose_name='Local'
     )
+    gestionnaire = tables.Column(
+        linkify=True,
+        verbose_name='Gestionnaire'
+    )
     status = columns.TemplateColumn(
         template_code='<span class="badge bg-{{ record.get_status_color }}">{{ record.get_status_display }}</span>',
         verbose_name='Statut'

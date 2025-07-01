@@ -35,4 +35,5 @@ urlpatterns = [
     path('gestionnaires/add/', views.GestionnaireCreateView.as_view(), name='gestionnaire_add'),
     path('gestionnaires/<int:pk>/edit/', views.GestionnaireEditView.as_view(), name='gestionnaire_edit'),
     path('gestionnaires/<int:pk>/delete/', views.GestionnaireDeleteView.as_view(), name='gestionnaire_delete'),
+    path('gestionnaires/<int:pk>/changelog/', views.GestionnaireView.as_view(), name='gestionnaire_changelog'),
 ]

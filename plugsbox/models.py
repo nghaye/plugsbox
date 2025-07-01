@@ -363,7 +363,8 @@ class Gestionnaire(NetBoxModel):
         verbose_name="Nom",
         help_text="Nom sluggifié du gestionnaire"
     )
-    description = models.TextField(
+    description = models.CharField(
+        max_length=100,
         verbose_name="Description",
         help_text="Description du gestionnaire"
     )
@@ -371,12 +372,16 @@ class Gestionnaire(NetBoxModel):
         to=Tenant,
         on_delete=models.PROTECT,
         related_name='gestionnaire',
+        blank=True,
+        null=True,
         verbose_name="Tenant"
     )
     user_group = models.OneToOneField(
         to=Group,
         on_delete=models.PROTECT,
         related_name='gestionnaire',
+        blank=True,
+        null=True,
         verbose_name="Groupe d'utilisateurs"
     )
 
@@ -390,4 +395,57 @@ class Gestionnaire(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:plugsbox:gestionnaire', args=[self.pk])
+    
+    def save(self, *args, **kwargs):
+        """Override save pour créer automatiquement tenant et user_group"""
+        # Sauvegarder d'abord l'objet pour avoir un ID
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # Si c'est un nouvel objet et qu'il n'a pas encore de tenant/user_group
+        if is_new and (not self.tenant or not self.user_group):
+            self._create_associated_objects()
+    
+    def _create_associated_objects(self):
+        """Crée les objets Tenant et UserGroup associés si ils n'existent pas"""
+        from tenancy.models import Tenant
+        from users.models import Group
+        from extras.models import Tag
+        
+        # Créer ou récupérer le tag "plugsbox"
+        plugsbox_tag, _ = Tag.objects.get_or_create(
+            name='plugsbox',
+            defaults={
+                'slug': 'plugsbox',
+                'description': 'Tag pour les objets créés par Plugsbox'
+            }
+        )
+        
+        # Créer le tenant s'il n'existe pas
+        if not self.tenant:
+            tenant, tenant_created = Tenant.objects.get_or_create(
+                slug=self.name,
+                defaults={
+                    'name': self.name,
+                    'description': self.description
+                }
+            )
+            
+            # Ajouter le tag au tenant
+            if tenant_created:
+                tenant.tags.add(plugsbox_tag)
+            
+            self.tenant = tenant
+        
+        # Créer le user group s'il n'existe pas
+        if not self.user_group:
+            user_group, _ = Group.objects.get_or_create(
+                name=self.name,
+                defaults={}
+            )
+            self.user_group = user_group
+        
+        # Sauvegarder à nouveau avec les objets associés
+        if self.tenant or self.user_group:
+            super().save(update_fields=['tenant', 'user_group'])
 
