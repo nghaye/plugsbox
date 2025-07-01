@@ -17,34 +17,6 @@ def default_activation_date():
     return date.today() + timedelta(days=7)
 
 
-def get_or_create_wall_jacks_manufacturer():
-    """Crée ou récupère le fabricant générique pour les prises murales"""
-    manufacturer, created = Manufacturer.objects.get_or_create(
-        name='Generic Wall Jacks',
-        defaults={
-            'slug': 'generic-wall-jacks',
-            'description': 'Fabricant générique pour les prises réseau murales'
-        }
-    )
-    return manufacturer
-
-
-def get_or_create_wall_jacks_device_type():
-    """Crée ou récupère le type de device générique pour les prises murales"""
-    manufacturer = get_or_create_wall_jacks_manufacturer()
-    device_type, created = DeviceType.objects.get_or_create(
-        manufacturer=manufacturer,
-        model='Wall Jacks Panel',
-        defaults={
-            'slug': 'wall-jacks-panel',
-            'description': 'Panneau virtuel pour les prises réseau murales',
-            'u_height': 0,  # Pas de hauteur rack
-            'is_full_depth': False,
-        }
-    )
-    return device_type
-
-
 def get_or_create_passive_device_role():
     """Crée ou récupère le rôle de device passif"""
     device_role, created = DeviceRole.objects.get_or_create(
@@ -115,24 +87,7 @@ def get_or_create_patch_panel_device(switch_name, site):
             'device_type': device_type,
             'role': device_role,
             'status': 'active',
-            'comments': f'Répartiteur pour les prises du site {site.name}'
-        }
-    )
-    return device
-
-
-def get_or_create_wall_jacks_device(site):
-    """Crée ou récupère le device générique pour les prises murales d'un site"""
-    device_type = get_or_create_wall_jacks_device_type()
-    device_role = get_or_create_passive_device_role()
-    device, created = Device.objects.get_or_create(
-        name=f'{site.slug}-prises',
-        site=site,
-        defaults={
-            'device_type': device_type,
-            'role': device_role,
-            'status': 'active',
-            'comments': f'Device virtuel pour les prises murales du site {site.name}'
+            'comments': f'Répartiteur pour les prises du site {patch_panel_name}'
         }
     )
     return device
@@ -337,17 +292,20 @@ class Plug(NetBoxModel):
         return self.patch_panel_plug
 
     def _connect_rear_port_to_device(self, rear_port):
-        """Connecte le rear port au related_device via l'interface avec l'ID le plus faible"""
+        """Connecte le rear port au related_device via l'interface Ethernet avec l'ID le plus faible"""
         if self.related_device:
-            # Trouver l'interface avec l'ID le plus faible
-            interface = Interface.objects.filter(device=self.related_device).order_by('id').first()
+            # Trouver l'interface Ethernet avec l'ID le plus faible
+            interface = Interface.objects.filter(
+                device=self.related_device,
+                type__icontains='base-t'
+            ).order_by('id').first()
             
             if interface:
                 # Créer un câble entre le rear port et l'interface du device
                 cable = Cable(
                     a_terminations=[rear_port],
                     b_terminations=[interface],
-                    label=f"{self.site.slug}-{self.name}-{self.related_device.name}",
+                    label=f"{self.site.slug}-{self.name} vers {self.related_device.name}",
                     type='cat6'
                 )
                 cable.save()
