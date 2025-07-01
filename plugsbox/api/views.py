@@ -7,7 +7,7 @@ from .serializers import PlugSerializer, GestionnaireSerializer
 
 class PlugViewSet(NetBoxModelViewSet):
     queryset = Plug.objects.select_related(
-        'site', 'tenant', 'contact', 'ip_address', 'vlan'
+        'site', 'gestionnaire', 'contact', 'ip_address', 'vlan'
     ).prefetch_related('tags')
     serializer_class = PlugSerializer
     filterset_class = PlugFilterSet

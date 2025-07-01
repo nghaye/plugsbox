@@ -82,13 +82,9 @@
                     <tr>
                         <th scope="row">Prises associées</th>
                         <td>
-                            {% if object.tenant %}
-                                <a href="{% url 'plugins:plugsbox:plug_list' %}?tenant={{ object.tenant.pk }}">
-                                    {{ object.tenant.plugs.count }} prises
-                                </a>
-                            {% else %}
-                                <span class="text-muted">0 prises</span>
-                            {% endif %}
+                            <a href="{% url 'plugins:plugsbox:plug_list' %}?gestionnaire={{ object.pk }}">
+                                {{ object.plugs.count }} prises
+                            </a>
                         </td>
                     </tr>
                 </table>

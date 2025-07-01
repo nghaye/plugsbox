@@ -69,10 +69,10 @@
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row">Tenant</th>
+                        <th scope="row">Gestionnaire</th>
                         <td>
-                            {% if object.tenant %}
-                                <a href="{{ object.tenant.get_absolute_url }}">{{ object.tenant }}</a>
+                            {% if object.gestionnaire %}
+                                <a href="{{ object.gestionnaire.get_absolute_url }}">{{ object.gestionnaire }}</a>
                             {% else %}
                                 <span class="text-muted">—</span>
                             {% endif %}

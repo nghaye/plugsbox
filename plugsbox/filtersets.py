@@ -37,15 +37,16 @@ class PlugFilterSet(NetBoxModelFilterSet):
         lookup_expr='icontains',
         label='Local'
     )
-    tenant_id = django_filters.ModelMultipleChoiceFilter(
-        queryset=Tenant.objects.all(),
+    gestionnaire_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='gestionnaire',
+        queryset=Gestionnaire.objects.all(),
         label='Gestionnaire (ID)',
     )
-    tenant = django_filters.ModelMultipleChoiceFilter(
-        field_name='tenant__slug',
-        queryset=Tenant.objects.all(),
-        to_field_name='slug',
-        label='Gestionnaire (slug)',
+    gestionnaire = django_filters.ModelMultipleChoiceFilter(
+        field_name='gestionnaire__name',
+        queryset=Gestionnaire.objects.all(),
+        to_field_name='name',
+        label='Gestionnaire (nom)',
     )
     contact_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Contact.objects.all(),
@@ -93,7 +94,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Plug
         fields = [
-            'id', 'name', 'site', 'location', 'tenant', 'contact', 
+            'id', 'name', 'site', 'location', 'gestionnaire', 'contact', 
             'status', 'interfaceconfig', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id',
         ]
 
@@ -107,7 +108,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value) |
             Q(site__name__icontains=value) |
             Q(location__name__icontains=value) |
-            Q(tenant__name__icontains=value) |
+            Q(gestionnaire__name__icontains=value) |
             Q(contact__name__icontains=value) |
             Q(switch__name__icontains=value) |
             Q(interface__name__icontains=value) |

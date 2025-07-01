@@ -61,12 +61,12 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
     class Meta(NetBoxTable.Meta):
         model = Plug
         fields = (
-            'pk', 'id', 'name', 'site', 'location', 'tenant', 'contact', 'status', 
+            'pk', 'id', 'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 
             'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id', 'comments', 
             'created', 'last_updated',
         )
         default_columns = (
-            'name', 'site', 'location', 'tenant', 'contact', 'status', 'interfaceconfig', 
+            'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 'interfaceconfig', 
             'ip_address', 'vlan', 'switch', 'interface', 'activation_date',
         )
 
@@ -90,7 +90,7 @@ class GestionnaireTable(NetBoxTable):
         verbose_name='Groupe d\'utilisateurs'
     )
     plug_count = tables.Column(
-        accessor='tenant__plugs__count',
+        accessor='plugs__count',
         verbose_name='Nombre de prises',
         orderable=False
     )

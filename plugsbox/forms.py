@@ -25,8 +25,8 @@ class PlugForm(NetBoxModelForm, TenancyForm):
         required=False,
         label='Local'
     )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
+    gestionnaire = DynamicModelChoiceField(
+        queryset=Gestionnaire.objects.all(),
         required=True,
         label='Gestionnaire'
     )
@@ -80,7 +80,7 @@ class PlugForm(NetBoxModelForm, TenancyForm):
     class Meta:
         model = Plug
         fields = [
-            'name', 'site', 'location', 'tenant', 'contact', 'status', 
+            'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 
             'interfaceconfig', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'comments',
         ]
         widgets = {
@@ -98,7 +98,7 @@ class PlugFilterForm(ContactModelFilterForm):
     """
     model = Plug
     field_order = [
-        'q', 'name', 'site', 'location', 'tenant', 'contact', 'status', 
+        'q', 'name', 'site', 'location', 'gestionnaire', 'contact', 'status', 
         'interfaceconfig', 'vlan', 'switch', 'interface', 'activation_date', 'legacy_id',
     ]
 
@@ -175,8 +175,8 @@ class PlugBulkEditForm(NetBoxModelForm):
         required=False,
         label='Local'
     )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
+    gestionnaire = DynamicModelChoiceField(
+        queryset=Gestionnaire.objects.all(),
         required=False,
         label='Gestionnaire'
     )

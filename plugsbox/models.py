@@ -84,8 +84,8 @@ class Plug(NetBoxModel):
         verbose_name="Numéro de la prise",
         help_text="Identifiant unique de la prise dans le bâtiment (ex: P-01-123)"
     )
-    tenant = models.ForeignKey(
-        to=Tenant,
+    gestionnaire = models.ForeignKey(
+        to='Gestionnaire',
         on_delete=models.PROTECT,
         related_name='plugs',
         verbose_name="Gestionnaire"
