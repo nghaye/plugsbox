@@ -3,7 +3,7 @@ import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin, TenancyColumnsMixin
 
-from .models import Plug
+from .models import Plug, Gestionnaire
 
 
 class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
@@ -68,4 +68,39 @@ class PlugTable(NetBoxTable, TenancyColumnsMixin, ContactsColumnMixin):
         default_columns = (
             'name', 'site', 'location', 'tenant', 'contact', 'status', 'interfaceconfig', 
             'ip_address', 'vlan', 'switch', 'interface', 'activation_date',
+        )
+
+
+class GestionnaireTable(NetBoxTable):
+    """
+    Table pour l'affichage des gestionnaires.
+    """
+    name = tables.Column(
+        linkify=True,
+        verbose_name='Nom'
+    )
+    description = tables.Column(
+        verbose_name='Description'
+    )
+    tenant = tables.Column(
+        linkify=True,
+        verbose_name='Tenant'
+    )
+    user_group = tables.Column(
+        verbose_name='Groupe d\'utilisateurs'
+    )
+    plug_count = tables.Column(
+        accessor='tenant__plugs__count',
+        verbose_name='Nombre de prises',
+        orderable=False
+    )
+    
+    class Meta(NetBoxTable.Meta):
+        model = Gestionnaire
+        fields = (
+            'pk', 'id', 'name', 'description', 'tenant', 'user_group', 'plug_count',
+            'created', 'last_updated',
+        )
+        default_columns = (
+            'name', 'description', 'tenant', 'user_group', 'plug_count',
         )

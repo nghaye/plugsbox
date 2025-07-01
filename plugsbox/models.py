@@ -7,6 +7,7 @@ from dcim.models import Cable, Device, DeviceRole, DeviceType, Interface, Manufa
 from ipam.models import IPAddress, VLAN
 from netbox.models import NetBoxModel
 from tenancy.models import Contact, Tenant
+from users.models import Group
 
 from .choices import PlugStatusChoices, PlugTypeChoices
 
@@ -350,4 +351,43 @@ class Plug(NetBoxModel):
         # Nettoyer les câbles et interfaces avant suppression
         self._cleanup_cable()
         super().delete(*args, **kwargs)
+
+
+class Gestionnaire(NetBoxModel):
+    """
+    Représente un gestionnaire de prises avec son tenant et user group associés.
+    """
+    name = models.SlugField(
+        max_length=100,
+        unique=True,
+        verbose_name="Nom",
+        help_text="Nom sluggifié du gestionnaire"
+    )
+    description = models.TextField(
+        verbose_name="Description",
+        help_text="Description du gestionnaire"
+    )
+    tenant = models.OneToOneField(
+        to=Tenant,
+        on_delete=models.PROTECT,
+        related_name='gestionnaire',
+        verbose_name="Tenant"
+    )
+    user_group = models.OneToOneField(
+        to=Group,
+        on_delete=models.PROTECT,
+        related_name='gestionnaire',
+        verbose_name="Groupe d'utilisateurs"
+    )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Gestionnaire'
+        verbose_name_plural = 'Gestionnaires'
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('plugins:plugsbox:gestionnaire', args=[self.pk])
 

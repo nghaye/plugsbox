@@ -20,4 +20,17 @@ menu_items = (
             ),
         )
     ),
+    PluginMenuItem(
+        link='plugins:plugsbox:gestionnaire_list',
+        link_text='Gestionnaires',
+        permissions=['plugsbox.view_gestionnaire'],
+        buttons=(
+            PluginMenuButton(
+                link='plugins:plugsbox:gestionnaire_add',
+                title='Ajouter',
+                icon_class='mdi mdi-plus-thick',
+                permissions=['plugsbox.add_gestionnaire'],
+            ),
+        )
+    ),
 )

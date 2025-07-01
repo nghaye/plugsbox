@@ -28,4 +28,11 @@ urlpatterns = [
     
     # Changelog
     path('plugs/<int:pk>/changelog/', views.PlugView.as_view(), name='plug_changelog'),
+    
+    # Gestionnaires
+    path('gestionnaires/', views.GestionnaireListView.as_view(), name='gestionnaire_list'),
+    path('gestionnaires/<int:pk>/', views.GestionnaireView.as_view(), name='gestionnaire'),
+    path('gestionnaires/add/', views.GestionnaireCreateView.as_view(), name='gestionnaire_add'),
+    path('gestionnaires/<int:pk>/edit/', views.GestionnaireEditView.as_view(), name='gestionnaire_edit'),
+    path('gestionnaires/<int:pk>/delete/', views.GestionnaireDeleteView.as_view(), name='gestionnaire_delete'),
 ]

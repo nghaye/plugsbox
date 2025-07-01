@@ -1,0 +1,43 @@
+{% extends 'generic/object_edit.html' %}
+{% load form_helpers %}
+
+{% block title %}
+    {% if object.pk %}
+        Éditer {{ object.name }}
+    {% else %}
+        Ajouter un Gestionnaire
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:gestionnaire_list' %}">Gestionnaires</a>
+    </li>
+    {% if object.pk %}
+        <li class="breadcrumb-item">
+            <a href="{% url 'plugins:plugsbox:gestionnaire' pk=object.pk %}">{{ object.name }}</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block form %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header">Informations du Gestionnaire</h5>
+            <div class="card-body">
+                {% if not object.pk %}
+                    <div class="alert alert-info">
+                        <i class="mdi mdi-information-outline"></i>
+                        <strong>Information :</strong> Un tenant et un groupe d'utilisateurs seront automatiquement créés avec le même nom et la même description.
+                        Le tenant aura le tag "plugsbox".
+                    </div>
+                {% endif %}
+                {% render_field form.name %}
+                {% render_field form.description %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

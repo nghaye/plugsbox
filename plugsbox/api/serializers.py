@@ -7,8 +7,9 @@ from ipam.api.serializers_.vlans import VLANSerializer
 from netbox.api.serializers import NetBoxModelSerializer
 from tenancy.api.serializers_.contacts import ContactSerializer
 from tenancy.api.serializers_.tenants import TenantSerializer
+from users.api.serializers_.groups import GroupSerializer
 
-from ..models import Plug
+from ..models import Plug, Gestionnaire
 
 
 class PlugSerializer(NetBoxModelSerializer):
@@ -40,4 +41,29 @@ class NestedPlugSerializer(NetBoxModelSerializer):
 
     class Meta:
         model = Plug
+        fields = ['id', 'url', 'display', 'name']
+
+
+class GestionnaireSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:plugsbox-api:gestionnaire-detail'
+    )
+    tenant = TenantSerializer(read_only=True)
+    user_group = GroupSerializer(read_only=True)
+
+    class Meta:
+        model = Gestionnaire
+        fields = [
+            'id', 'url', 'display', 'name', 'description', 'tenant', 
+            'user_group', 'tags', 'custom_fields', 'created', 'last_updated'
+        ]
+
+
+class NestedGestionnaireSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:plugsbox-api:gestionnaire-detail'
+    )
+
+    class Meta:
+        model = Gestionnaire
         fields = ['id', 'url', 'display', 'name']

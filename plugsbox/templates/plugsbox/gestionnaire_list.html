@@ -1,0 +1,14 @@
+{% extends 'generic/object_list.html' %}
+{% load helpers %}
+
+{% block title %}Gestionnaires{% endblock %}
+
+{% block content_title %}
+    <h1>Gestionnaires</h1>
+{% endblock %}
+
+{% block add_button %}
+    <a href="{% url 'plugins:plugsbox:gestionnaire_add' %}" class="btn btn-primary">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Ajouter
+    </a>
+{% endblock %}

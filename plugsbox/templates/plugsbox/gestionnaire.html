@@ -1,0 +1,156 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="breadcrumb-item">
+        <a href="{% url 'plugins:plugsbox:gestionnaire_list' %}">Gestionnaires</a>
+    </li>
+{% endblock %}
+
+{% block tabs %}
+    <ul class="nav nav-tabs px-3" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+                Détails
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="changelog-tab" data-bs-toggle="tab" data-bs-target="#changelog" type="button" role="tab" aria-controls="changelog" aria-selected="false">
+                Journal
+            </button>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+<div class="row">
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Informations Générales</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Nom</th>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td>{{ object.description|linebreaks }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col col-md-6">
+        <div class="card">
+            <h5 class="card-header">Objets Associés</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Tenant</th>
+                        <td>
+                            {% if object.tenant %}
+                                <a href="{{ object.tenant.get_absolute_url }}">{{ object.tenant }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Groupe d'utilisateurs</th>
+                        <td>
+                            {% if object.user_group %}
+                                {{ object.user_group.name }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h5 class="card-header">Statistiques</h5>
+            <div class="card-body">
+                <table class="table table-hover attr-table">
+                    <tr>
+                        <th scope="row">Prises associées</th>
+                        <td>
+                            {% if object.tenant %}
+                                <a href="{% url 'plugins:plugsbox:plug_list' %}?tenant={{ object.tenant.pk }}">
+                                    {{ object.tenant.plugs.count }} prises
+                                </a>
+                            {% else %}
+                                <span class="text-muted">0 prises</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+    <div class="tab-pane fade" id="changelog" role="tabpanel" aria-labelledby="changelog-tab">
+        <div class="card">
+            <div class="card-body">
+                <h5>Historique des modifications</h5>
+                {% with object_changes=object.objectchanges.all %}
+                    {% if object_changes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Utilisateur</th>
+                                        <th>Action</th>
+                                        <th>Détails</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for change in object_changes %}
+                                    <tr>
+                                        <td>{{ change.time|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if change.user %}
+                                                {{ change.user.username }}
+                                            {% else %}
+                                                <em>Système</em>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if change.action == 1 %}
+                                                <span class="badge bg-success">Création</span>
+                                            {% elif change.action == 2 %}
+                                                <span class="badge bg-warning">Modification</span>
+                                            {% elif change.action == 3 %}
+                                                <span class="badge bg-danger">Suppression</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if change.changed_object_repr %}
+                                                {{ change.changed_object_repr }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune modification enregistrée.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

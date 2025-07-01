@@ -9,7 +9,7 @@ from utilities.forms import add_blank_choice
 from utilities.forms.fields import CommentField, DynamicModelChoiceField
 
 from .choices import PlugStatusChoices, PlugTypeChoices
-from .models import Plug
+from .models import Plug, Gestionnaire
 
 
 class PlugForm(NetBoxModelForm, TenancyForm):
@@ -228,3 +228,23 @@ class PlugBulkEditForm(NetBoxModelForm):
         nullable_fields = [
             'location', 'contact', 'ip_address', 'vlan', 'switch', 'interface', 'activation_date', 'comments',
         ]
+
+
+class GestionnaireForm(NetBoxModelForm):
+    """
+    Formulaire pour la création/modification d'un gestionnaire.
+    """
+    name = forms.CharField(
+        max_length=100,
+        label='Nom',
+        help_text="Nom du gestionnaire (sera sluggifié automatiquement)"
+    )
+    description = forms.CharField(
+        widget=forms.Textarea,
+        label='Description',
+        help_text="Description du gestionnaire"
+    )
+
+    class Meta:
+        model = Gestionnaire
+        fields = ['name', 'description']

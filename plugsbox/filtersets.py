@@ -8,7 +8,7 @@ from tenancy.models import Contact, Tenant
 #from utilities.filters import MultiValueCharFilter
 
 from .choices import PlugStatusChoices, PlugTypeChoices
-from .models import Plug
+from .models import Plug, Gestionnaire
 
 
 class PlugFilterSet(NetBoxModelFilterSet):
@@ -112,5 +112,51 @@ class PlugFilterSet(NetBoxModelFilterSet):
             Q(switch__name__icontains=value) |
             Q(interface__name__icontains=value) |
             Q(comments__icontains=value)
+        )
+        return queryset.filter(qs_filter)
+
+
+class GestionnaireFilterSet(NetBoxModelFilterSet):
+    """
+    FilterSet pour les gestionnaires.
+    """
+    q = django_filters.CharFilter(
+        method='search',
+        label='Recherche',
+    )
+    name = django_filters.CharFilter(
+        lookup_expr='icontains',
+        label='Nom'
+    )
+    description = django_filters.CharFilter(
+        lookup_expr='icontains',
+        label='Description'
+    )
+    tenant_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Tenant.objects.all(),
+        label='Tenant (ID)',
+    )
+    tenant = django_filters.ModelMultipleChoiceFilter(
+        field_name='tenant__slug',
+        queryset=Tenant.objects.all(),
+        to_field_name='slug',
+        label='Tenant (slug)',
+    )
+
+    class Meta:
+        model = Gestionnaire
+        fields = ['id', 'name', 'description', 'tenant']
+
+    def search(self, queryset, name, value):
+        """
+        Recherche dans les champs principaux.
+        """
+        if not value.strip():
+            return queryset
+        qs_filter = (
+            Q(name__icontains=value) |
+            Q(description__icontains=value) |
+            Q(tenant__name__icontains=value) |
+            Q(user_group__name__icontains=value)
         )
         return queryset.filter(qs_filter)
