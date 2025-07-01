@@ -409,6 +409,14 @@ class Plug(NetBoxModel):
                 raise ValidationError({
                     'interface': f"L'interface {self.interface} n'appartient pas au switch {self.switch}"
                 })
+        
+        # Vérifier que l'interface n'est pas déjà utilisée par un autre Plug
+        if self.interface:
+            existing_plug = Plug.objects.filter(interface=self.interface).exclude(pk=self.pk).first()
+            if existing_plug:
+                raise ValidationError({
+                    'interface': f"L'interface {self.interface} est déjà utilisée par la prise {existing_plug.name} ({existing_plug.site.name})"
+                })
 
     def delete(self, *args, **kwargs):
         """Suppression avec nettoyage des câbles"""

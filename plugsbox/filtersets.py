@@ -88,7 +88,7 @@ class PlugFilterSet(NetBoxModelFilterSet):
         label="Date d'activation souhaitée"
     )
     legacy_id = django_filters.NumberFilter(
-        label='ID ancien système'
+        label='ID Plugs'
     )
     related_device_id = django_filters.ModelMultipleChoiceFilter(
         field_name='related_device',

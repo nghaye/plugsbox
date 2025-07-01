@@ -8,12 +8,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             const interfaceConfigField = document.getElementById('id_interfaceconfig');
             const statusField = document.getElementById('id_status');
-            const ipAddressField = document.getElementById('id_ip_address');
+            const ipAddressStaticField = document.getElementById('id_ip_address_static');
+            const dnsNameField = document.getElementById('id_dns_name');
             const vlanField = document.getElementById('id_vlan');
             const switchField = document.getElementById('id_switch');
             const interfaceField = document.getElementById('id_interface');
             
-            const ipAddressRow = ipAddressField ? ipAddressField.closest('.mb-3') : null;
+            const ipAddressStaticRow = ipAddressStaticField ? ipAddressStaticField.closest('.mb-3') : null;
+            const dnsNameRow = dnsNameField ? dnsNameField.closest('.mb-3') : null;
             const vlanRow = vlanField ? vlanField.closest('.mb-3') : null;
             const switchRow = switchField ? switchField.closest('.mb-3') : null;
             const interfaceRow = interfaceField ? interfaceField.closest('.mb-3') : null;
@@ -26,13 +28,23 @@
                 const interfaceConfigValue = interfaceConfigField.value;
                 const statusValue = statusField.value;
                 
-                // IP Address field - only visible for 'static'
-                if (ipAddressField && ipAddressRow) {
+                // IP Address static field - only visible for 'static'
+                if (ipAddressStaticField && ipAddressStaticRow) {
                     if (interfaceConfigValue === 'static') {
-                        ipAddressRow.style.display = '';
+                        ipAddressStaticRow.style.display = '';
                     } else {
-                        ipAddressRow.style.display = 'none';
-                        ipAddressField.value = '';
+                        ipAddressStaticRow.style.display = 'none';
+                        ipAddressStaticField.value = '';
+                    }
+                }
+                
+                // DNS Name field - only visible for 'static'
+                if (dnsNameField && dnsNameRow) {
+                    if (interfaceConfigValue === 'static') {
+                        dnsNameRow.style.display = '';
+                    } else {
+                        dnsNameRow.style.display = 'none';
+                        dnsNameField.value = '';
                     }
                 }
                 
@@ -182,7 +194,8 @@
             <div class="card-body">
                 {% render_field form.interfaceconfig %}
                 {% render_field form.vlan %}
-                {% render_field form.ip_address %}
+                {% render_field form.ip_address_static %}
+                {% render_field form.dns_name %}
                 {% render_field form.status %}
                 {% render_field form.switch %}
                 {% render_field form.interface %}

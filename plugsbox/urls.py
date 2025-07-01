@@ -4,6 +4,9 @@ from . import views
 app_name = 'plugsbox'
 
 urlpatterns = [
+    # Page d'accueil
+    path('', views.HomeView.as_view(), name='home'),
+    
     # Liste des prises
     path('plugs/', views.PlugListView.as_view(), name='plug_list'),
     

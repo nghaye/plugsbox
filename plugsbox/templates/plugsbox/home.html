@@ -1,0 +1,204 @@
+{% extends 'base/layout.html' %}
+{% load buttons %}
+{% load helpers %}
+
+{% block title %}Plugsbox - Accueil{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Plugsbox - Tableau de bord</h1>
+</div>
+
+{% if gestionnaire %}
+    <div class="alert alert-info">
+        <i class="mdi mdi-account-cog"></i>
+        Connecté en tant que gestionnaire : <strong>{{ gestionnaire.description }}</strong>
+    </div>
+
+    <!-- Raccourcis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="mdi mdi-lightning-bolt"></i> Raccourcis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'plugins:plugsbox:plug_add' %}?gestionnaire={{ gestionnaire.pk }}" class="btn btn-success btn-lg btn-block mb-2">
+                                <i class="mdi mdi-plus-circle"></i><br>
+                                Activer une prise
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'plugins:plugsbox:plug_list' %}?gestionnaire={{ gestionnaire.pk }}" class="btn btn-primary btn-lg btn-block mb-2">
+                                <i class="mdi mdi-magnify"></i><br>
+                                Rechercher une prise
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'plugins:plugsbox:plug_list' %}?gestionnaire={{ gestionnaire.pk }}" class="btn btn-info btn-lg btn-block mb-2">
+                                <i class="mdi mdi-format-list-bulleted"></i><br>
+                                Lister toutes les prises
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'plugins:plugsbox:plug_list' %}?gestionnaire={{ gestionnaire.pk }}&status=to_patch&status=to_configure&status=defective&status=verify_patching&status=verify_fluke" class="btn btn-warning btn-lg btn-block mb-2">
+                                <i class="mdi mdi-clock-alert"></i><br>
+                                Prises en attente
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="mdi mdi-chart-box"></i> Statistiques</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <div class="display-4 text-primary">{{ stats.total }}</div>
+                                <small class="text-muted">Total prises</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <div class="display-4 text-success">{{ stats.operational }}</div>
+                                <small class="text-muted">Opérationnelles</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <div class="display-4 text-warning">{{ stats.pending }}</div>
+                                <small class="text-muted">En attente</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <div class="display-4 text-info">{{ stats.to_configure }}</div>
+                                <small class="text-muted">À configurer</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <div class="display-4 text-secondary">{{ stats.mab_count }}</div>
+                                <small class="text-muted">En MAB</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <a href="{% url 'plugins:plugsbox:plug_list' %}?gestionnaire={{ gestionnaire.pk }}" class="btn btn-outline-primary">
+                                    <i class="mdi mdi-arrow-right"></i> Voir tout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dernières prises modifiées -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="mdi mdi-history"></i> Dernières prises modifiées</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_plugs %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Prise</th>
+                                        <th>Site</th>
+                                        <th>Local</th>
+                                        <th>Statut</th>
+                                        <th>Type</th>
+                                        <th>Dernière modification</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for plug in recent_plugs %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'plugins:plugsbox:plug' pk=plug.pk %}">{{ plug.name }}</a>
+                                        </td>
+                                        <td>{{ plug.site.name }}</td>
+                                        <td>{{ plug.location|default:"-" }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ plug.get_status_color }}">
+                                                {{ plug.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ plug.get_interfaceconfig_display }}</td>
+                                        <td>{{ plug.last_updated|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'plugins:plugsbox:plug' pk=plug.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="mdi mdi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'plugins:plugsbox:plug_edit' pk=plug.pk %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="mdi mdi-pencil"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune prise modifiée récemment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Utilisateur sans gestionnaire -->
+    <div class="alert alert-warning">
+        <i class="mdi mdi-alert-circle"></i>
+        <strong>Aucun gestionnaire détecté</strong><br>
+        Votre compte utilisateur n'est associé à aucun gestionnaire Plugsbox. 
+        Contactez votre administrateur pour être ajouté à un groupe gestionnaire.
+    </div>
+
+    <!-- Accès généraliste -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="mdi mdi-cogs"></i> Accès administrateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'plugins:plugsbox:plug_list' %}" class="btn btn-primary btn-block mb-2">
+                                <i class="mdi mdi-format-list-bulleted"></i>
+                                Toutes les prises
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'plugins:plugsbox:gestionnaire_list' %}" class="btn btn-secondary btn-block mb-2">
+                                <i class="mdi mdi-account-multiple"></i>
+                                Gestionnaires
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

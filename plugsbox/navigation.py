@@ -2,6 +2,11 @@ from netbox.plugins import PluginMenuItem, PluginMenuButton
 
 menu_items = (
     PluginMenuItem(
+        link='plugins:plugsbox:home',
+        link_text='Accueil',
+        permissions=[]
+    ),
+    PluginMenuItem(
         link='plugins:plugsbox:plug_list',
         link_text='Prises Réseau',
         permissions=['plugsbox.view_plug'],
