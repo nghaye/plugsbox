@@ -1,0 +1,77 @@
+{% load helpers %}
+
+{% with plugs=object.plugs.all %}
+{% if plugs %}
+<div class="card">
+    <h5 class="card-header">
+        <i class="mdi mdi-ethernet-cable"></i>
+        Prises Réseau Associées
+        <span class="badge bg-secondary ms-2">{{ plugs.count }}</span>
+    </h5>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Site</th>
+                        <th>Local</th>
+                        <th>Statut</th>
+                        <th>Configuration</th>
+                        <th>Interface</th>
+                        <th>Gestionnaire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plug in plugs %}
+                    <tr>
+                        <td>
+                            <a href="{{ plug.get_absolute_url }}">{{ plug.name }}</a>
+                        </td>
+                        <td>
+                            {% if plug.site %}
+                                <a href="{{ plug.site.get_absolute_url }}">{{ plug.site.name }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ plug.location|default:"—" }}</td>
+                        <td>
+                            <span class="badge bg-{{ plug.get_status_color }}">
+                                {{ plug.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ plug.get_interfaceconfig_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if plug.interface %}
+                                <a href="{{ plug.interface.get_absolute_url }}">{{ plug.interface.name }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if plug.gestionnaire %}
+                                <a href="{{ plug.gestionnaire.get_absolute_url }}">{{ plug.gestionnaire.name }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'plugins:plugsbox:plug_edit' pk=plug.pk %}" class="btn btn-sm btn-outline-warning">
+                                <i class="mdi mdi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endwith %}

@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from netbox.views import generic
 from tenancy.models import Tenant
 from extras.models import Tag
+from dcim.models import Device
 
 from .models import Plug, Gestionnaire
 from .forms import PlugForm, PlugFilterForm, PlugBulkEditForm, GestionnaireForm
@@ -204,5 +205,28 @@ class HomeView(TemplateView):
                 'pending': 0
             }
             context['recent_plugs'] = []
+        
+        return context
+
+
+class DevicePlugsView(TemplateView):
+    """
+    Vue pour afficher les prises associées à un device.
+    """
+    template_name = 'dcim/device/plugs.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Récupérer le device
+        device = get_object_or_404(Device, pk=kwargs['pk'])
+        context['object'] = device
+        
+        # Récupérer les prises associées au device
+        plugs = Plug.objects.filter(switch=device).prefetch_related(
+            'site', 'gestionnaire', 'interface', 'contact'
+        ).order_by('site__name', 'name')
+        
+        context['plugs'] = plugs
         
         return context

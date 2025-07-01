@@ -13,6 +13,7 @@ class PlugsboxConfig(PluginConfig):
     required_settings = []
     default_settings = {}
     menu_items = 'navigation.menu_items'
+    template_extensions = 'template_content.template_extensions'
 
 
 config = PlugsboxConfig

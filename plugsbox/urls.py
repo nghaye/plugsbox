@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views
+from netbox.views.generic import ObjectChangeLogView
+from . import views, models
 
 app_name = 'plugsbox'
 
@@ -30,8 +31,13 @@ urlpatterns = [
     path('plugs/delete/', views.PlugBulkDeleteView.as_view(), name='plug_bulk_delete'),
     
     # Changelog
-    path('plugs/<int:pk>/changelog/', views.PlugView.as_view(), name='plug_changelog'),
-    
+    #path('plugs/<int:pk>/changelog/', views.PlugView.as_view(), name='plug_changelog'),
+    path(
+        'plugs/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='plug_changelog',
+        kwargs={'model': models.Plug},
+    ),
     # Gestionnaires
     path('gestionnaires/', views.GestionnaireListView.as_view(), name='gestionnaire_list'),
     path('gestionnaires/<int:pk>/', views.GestionnaireView.as_view(), name='gestionnaire'),
@@ -39,4 +45,7 @@ urlpatterns = [
     path('gestionnaires/<int:pk>/edit/', views.GestionnaireEditView.as_view(), name='gestionnaire_edit'),
     path('gestionnaires/<int:pk>/delete/', views.GestionnaireDeleteView.as_view(), name='gestionnaire_delete'),
     path('gestionnaires/<int:pk>/changelog/', views.GestionnaireView.as_view(), name='gestionnaire_changelog'),
+    
+    # Vue des plugs pour un device
+    path('device/<int:pk>/plugs/', views.DevicePlugsView.as_view(), name='device_plugs'),
 ]
