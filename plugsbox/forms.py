@@ -84,7 +84,8 @@ class PlugForm(NetBoxModelForm):
         queryset=Device.objects.all(),
         required=False,
         query_params={
-            'site_id': '$site'
+            'site_id': '$site',
+            'role': 'wifi'
         },
         label='Device associé',
         help_text='Device connecté au répartiteur (ex: access point)'
